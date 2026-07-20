@@ -8,6 +8,7 @@ import { getDb } from "../../db";
 import { tasks } from "../../db/schema";
 import { selectTaskSchema, insertTaskSchema, updateTaskSchema } from "./validation";
 import { authMiddleware } from "../../middleware/auth";
+import { markOperation } from "../../middleware/operation-log";
 
 // ===================== Task List =====================
 class TaskList extends OpenAPIRoute {
@@ -102,6 +103,7 @@ class TaskCreate extends OpenAPIRoute {
 
 		try {
 			const [inserted] = await db.insert(tasks).values(data.body).returning();
+			markOperation(c, "create", "创建任务");
 			return c.json({ success: true, result: inserted }, 201);
 		} catch (e: any) {
 			if (e.message?.includes("UNIQUE constraint failed")) {
@@ -178,6 +180,7 @@ class TaskUpdate extends OpenAPIRoute {
 				.where(eq(tasks.id, data.params.id))
 				.returning();
 
+			markOperation(c, "update", "修改任务");
 			return c.json({ success: true, result: updated });
 		} catch (e: any) {
 			if (e.message?.includes("UNIQUE constraint failed")) {
@@ -220,6 +223,7 @@ class TaskDelete extends OpenAPIRoute {
 			throw new ApiException("Task not found");
 		}
 
+		markOperation(c, "delete", "删除任务");
 		return c.json({ success: true, result: deleted });
 	}
 }

@@ -3,9 +3,13 @@ import { Hono } from "hono";
 import { tasksRouter } from "./endpoints/tasks";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { DummyEndpoint } from "./endpoints/dummyEndpoint";
+import { operationLogMiddleware } from "./middleware/operation-log";
 
 // Start a Hono app
 const app = new Hono<{ Bindings: Env }>();
+
+// 全局操作日志中间件（仅当路由注入了 opLog() 才输出）
+app.use("*", operationLogMiddleware);
 
 app.onError((err, c) => {
 	if (err instanceof ApiException) {
