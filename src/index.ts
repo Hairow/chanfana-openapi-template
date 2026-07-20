@@ -40,6 +40,7 @@ const openapi = fromHono(app, {
 	},
 });
 
+
 // Register Tasks Sub router
 openapi.route("/tasks", tasksRouter);
 

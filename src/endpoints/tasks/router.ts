@@ -8,6 +8,9 @@ import { TaskDelete } from "./taskDelete";
 
 export const tasksRouter = fromHono(new Hono());
 
+// 路由级别中间件，对所有 /tasks/* 生效
+// tasksRouter.use("*", authMiddleware);
+
 tasksRouter.get("/", TaskList);
 tasksRouter.post("/", TaskCreate);
 tasksRouter.get("/:id", TaskRead);
