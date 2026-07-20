@@ -7,6 +7,7 @@ import { AppContext } from "../../types";
 import { getDb } from "../../db";
 import { tasks } from "../../db/schema";
 import { selectTaskSchema, insertTaskSchema, updateTaskSchema } from "./validation";
+import { authMiddleware } from "../../middleware/auth";
 
 // ===================== Task List =====================
 class TaskList extends OpenAPIRoute {
@@ -227,7 +228,7 @@ class TaskDelete extends OpenAPIRoute {
 export const tasksRouter = fromHono(new Hono());
 
 // 路由级别中间件，对所有 /tasks/* 生效
-// tasksRouter.use("*", authMiddleware);
+tasksRouter.use("*", authMiddleware);
 
 tasksRouter.get("/", TaskList);
 tasksRouter.post("/", TaskCreate);

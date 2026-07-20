@@ -13,5 +13,8 @@
 			"database_name": "my-db-name",
 			"database_id": "8578136b-3a1d-4543-b12c-88136633fe53"
 		}
-	]
+	],
+	"vars": {
+		"API_TOKEN": ""
+	}
 }
