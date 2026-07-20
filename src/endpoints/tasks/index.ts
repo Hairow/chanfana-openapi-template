@@ -1,6 +1,5 @@
-import { contentJson, OpenAPIRoute, ApiException } from "chanfana";
+import { contentJson, OpenAPIRoute, ApiException, fromHono } from "chanfana";
 import { Hono } from "hono";
-import { fromHono } from "chanfana";
 import { z } from "zod";
 import { eq, like, or, sql } from "drizzle-orm";
 import { AppContext } from "../../types";
@@ -8,7 +7,7 @@ import { getDb } from "../../db";
 import { tasks } from "../../db/schema";
 import { selectTaskSchema, insertTaskSchema, updateTaskSchema } from "./validation";
 import { authMiddleware } from "../../middleware/auth";
-import { markOperation } from "../../middleware/operation-log";
+import { OperationLog } from "../../middleware/operation-log";
 
 // ===================== Task List =====================
 class TaskList extends OpenAPIRoute {
@@ -83,6 +82,8 @@ class TaskList extends OpenAPIRoute {
 
 // ===================== Task Create =====================
 class TaskCreate extends OpenAPIRoute {
+	static operationLog: OperationLog = { type: "create", label: "创建任务" };
+
 	schema = {
 		tags: ["Tasks"],
 		summary: "Create a new task",
@@ -103,7 +104,6 @@ class TaskCreate extends OpenAPIRoute {
 
 		try {
 			const [inserted] = await db.insert(tasks).values(data.body).returning();
-			markOperation(c, "create", "创建任务");
 			return c.json({ success: true, result: inserted }, 201);
 		} catch (e: any) {
 			if (e.message?.includes("UNIQUE constraint failed")) {
@@ -149,6 +149,8 @@ class TaskRead extends OpenAPIRoute {
 
 // ===================== Task Update =====================
 class TaskUpdate extends OpenAPIRoute {
+	static operationLog: OperationLog = { type: "update", label: "修改任务" };
+
 	schema = {
 		tags: ["Tasks"],
 		summary: "Update a task by ID",
@@ -180,7 +182,6 @@ class TaskUpdate extends OpenAPIRoute {
 				.where(eq(tasks.id, data.params.id))
 				.returning();
 
-			markOperation(c, "update", "修改任务");
 			return c.json({ success: true, result: updated });
 		} catch (e: any) {
 			if (e.message?.includes("UNIQUE constraint failed")) {
@@ -196,6 +197,8 @@ class TaskUpdate extends OpenAPIRoute {
 
 // ===================== Task Delete =====================
 class TaskDelete extends OpenAPIRoute {
+	static operationLog: OperationLog = { type: "delete", label: "删除任务" };
+
 	schema = {
 		tags: ["Tasks"],
 		summary: "Delete a task by ID",
@@ -223,7 +226,6 @@ class TaskDelete extends OpenAPIRoute {
 			throw new ApiException("Task not found");
 		}
 
-		markOperation(c, "delete", "删除任务");
 		return c.json({ success: true, result: deleted });
 	}
 }
