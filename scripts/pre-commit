@@ -1,0 +1,14 @@
+#!/bin/sh
+# pre-commit: schema.ts 变更时自动运行 drizzle-kit generate
+# 安装：npm install 时会通过 prepare 脚本自动设置
+
+if git diff --cached --name-only | grep -q "^src/db/schema.ts$"; then
+  echo "→ schema.ts 已变更，自动生成 migration..."
+
+  npx drizzle-kit generate
+
+  # 把新生成的 migration 文件加入暂存区
+  git add migrations/
+
+  echo "✓ migration 已生成并加入本次 commit"
+fi
