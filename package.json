@@ -35,12 +35,12 @@
 	"scripts": {
 		"cf-typegen": "wrangler types",
 		"db:generate": "drizzle-kit generate",
-		"deploy": "wrangler deploy",
-		"prepare": "cp scripts/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit",
+		"predev": "wrangler d1 migrations apply DB --local",
 		"dev": "wrangler dev",
 		"predeploy": "wrangler d1 migrations apply DB --remote",
+		"deploy": "wrangler deploy",
+		"prepare": "cp scripts/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit",
 		"schema": "npx chanfana",
-		"seedLocalDb": "wrangler d1 migrations apply DB --local",
 		"test": "wrangler deploy --dry-run && npx vitest run --config tests/vitest.config.mts"
 	}
 }
