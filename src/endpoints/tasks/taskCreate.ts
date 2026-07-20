@@ -2,7 +2,8 @@ import { contentJson, OpenAPIRoute } from "chanfana";
 import { z } from "zod";
 import { AppContext } from "../../types";
 import { getDb } from "../../db";
-import { tasks, insertTaskSchema, selectTaskSchema } from "../../db/schema";
+import { tasks } from "../../db/schema";
+import { insertTaskSchema, selectTaskSchema } from "./validation";
 
 export class TaskCreate extends OpenAPIRoute {
 	schema = {

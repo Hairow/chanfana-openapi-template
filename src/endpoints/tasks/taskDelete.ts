@@ -3,7 +3,8 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { AppContext } from "../../types";
 import { getDb } from "../../db";
-import { tasks, selectTaskSchema } from "../../db/schema";
+import { tasks } from "../../db/schema";
+import { selectTaskSchema } from "./validation";
 
 export class TaskDelete extends OpenAPIRoute {
 	schema = {
