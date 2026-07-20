@@ -1,4 +1,4 @@
-import { contentJson, OpenAPIRoute, ApiException, fromHono } from "chanfana";
+import { contentJson, OpenAPIRoute, ApiException } from "chanfana";
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, like, or, sql } from "drizzle-orm";
@@ -7,7 +7,7 @@ import { getDb } from "../../db";
 import { tasks } from "../../db/schema";
 import { selectTaskSchema, insertTaskSchema, updateTaskSchema } from "./validation";
 import { authMiddleware } from "../../middleware/auth";
-import { OperationLog } from "../../middleware/operation-log";
+import { OperationLog, fromHono } from "../../from-hono";
 
 // ===================== Task List =====================
 class TaskList extends OpenAPIRoute {

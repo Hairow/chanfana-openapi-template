@@ -1,28 +1,27 @@
-import { ApiException, fromHono } from "chanfana";
+import { ApiException } from "chanfana";
 import { Hono } from "hono";
 import { tasksRouter } from "./endpoints/tasks";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { DummyEndpoint } from "./endpoints/dummyEndpoint";
 import { operationLogMiddleware } from "./middleware/operation-log";
+import { fromHono, collectRouteMapFromOpenapi } from "./from-hono";
 
 // Start a Hono app
 const app = new Hono<{ Bindings: Env }>();
 
-// 全局操作日志中间件（仅当路由注入了 opLog() 才输出）
+// 全局操作日志中间件
 app.use("*", operationLogMiddleware);
 
 app.onError((err, c) => {
 	if (err instanceof ApiException) {
-		// If it's a Chanfana ApiException, let Chanfana handle the response
 		return c.json(
 			{ success: false, errors: err.buildResponse() },
 			err.status as ContentfulStatusCode,
 		);
 	}
 
-	console.error("Global error handler caught:", err); // Log the error if it's not known
+	console.error("Global error handler caught:", err);
 
-	// For other errors, return a generic 500 response
 	return c.json(
 		{
 			success: false,
@@ -44,12 +43,14 @@ const openapi = fromHono(app, {
 	},
 });
 
-
 // Register Tasks Sub router
 openapi.route("/tasks", tasksRouter);
 
 // Register other endpoints
 openapi.post("/dummy/:slug", DummyEndpoint);
+
+// 路由注册完毕，基于 openapi.registry.definitions 自动收集 routeMap
+collectRouteMapFromOpenapi(openapi);
 
 // Export the Hono app
 export default app;
