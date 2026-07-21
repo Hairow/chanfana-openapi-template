@@ -6,7 +6,7 @@ import { AppContext } from "../../types";
 import { getDb } from "../../db";
 import { tasks } from "../../db/schema";
 import { TaskInsertValidator, TaskSelectValidator, TaskUpdateValidator } from "./validator";
-import { TaskListSchema, TaskDetailSchema, TaskBaseSchema } from "./model"
+import { TaskListSchema, TaskDetailSchema, TaskBaseSchema } from "./entity"
 import { OperationLog, fromHono } from "../../from-hono";
 import { IdParam, PaginationResultInfo } from "../../utils/zod-utils";
 
