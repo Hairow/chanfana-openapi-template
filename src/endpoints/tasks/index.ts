@@ -5,8 +5,8 @@ import { and, eq, like, or, sql } from "drizzle-orm";
 import { AppContext } from "../../types";
 import { getDb } from "../../db";
 import { tasks } from "../../db/schema";
-import { selectTaskSchema, insertTaskSchema, updateTaskSchema } from "./validation1";
-import { authMiddleware } from "../../middleware/auth";
+import { insertTaskSchema, updateTaskSchema } from "./validation1";
+import { taskListSchema, taskDetailSchema } from "./task-model"
 import { OperationLog, fromHono } from "../../from-hono";
 import { IdParam, PaginationParams } from "../../utils/zod-utils";
 
@@ -29,7 +29,7 @@ class TaskList extends OpenAPIRoute {
 				...contentJson(
 					z.object({
 						success: z.boolean(),
-						result: z.array(selectTaskSchema),
+						result: z.array(taskListSchema),
 						result_info: z.object({
 							count: z.number(),
 							page: z.number(),
@@ -98,7 +98,7 @@ class TaskCreate extends OpenAPIRoute {
 		responses: {
 			"201": {
 				description: "Returns the created task",
-				...contentJson(z.object({ success: z.boolean(), result: selectTaskSchema })),
+				...contentJson(z.object({ success: z.boolean(), result: taskListSchema })),
 			},
 		},
 	};
@@ -133,7 +133,7 @@ class TaskRead extends OpenAPIRoute {
 		responses: {
 			"200": {
 				description: "Task found",
-				...contentJson(z.object({ success: z.boolean(), result: selectTaskSchema })),
+				...contentJson(z.object({ success: z.boolean(), result: taskDetailSchema })),
 			},
 		},
 	};
@@ -166,7 +166,7 @@ class TaskUpdate extends OpenAPIRoute {
 		responses: {
 			"200": {
 				description: "Returns the updated task",
-				...contentJson(z.object({ success: z.boolean(), result: selectTaskSchema })),
+				...contentJson(z.object({ success: z.boolean(), result: taskListSchema })),
 			},
 		},
 	};
@@ -211,7 +211,7 @@ class TaskDelete extends OpenAPIRoute {
 		responses: {
 			"200": {
 				description: "Returns the deleted task",
-				...contentJson(z.object({ success: z.boolean(), result: selectTaskSchema })),
+				...contentJson(z.object({ success: z.boolean(), result: taskListSchema })),
 			},
 		},
 	};

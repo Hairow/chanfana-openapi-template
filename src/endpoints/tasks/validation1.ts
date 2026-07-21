@@ -1,17 +1,5 @@
 // src/routes/tasks/validation.ts
 import { z } from 'zod';
-import { formatDateTime } from '../../utils/date';
-
-// ✅ 使用完全标准的手写 Zod Schema
-export const selectTaskSchema = z.object({
-    id: z.number().int(),
-    name: z.string(),
-    slug: z.string(),
-    status: z.number(),
-    description: z.string(),
-    completed: z.boolean(),
-    due_date: z.string().transform(formatDateTime),
-});
 
 export const insertTaskSchema = z.object({
     name: z.string(),
