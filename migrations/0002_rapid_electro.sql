@@ -1,0 +1,1 @@
+ALTER TABLE `tasks` ADD `status` integer DEFAULT 0 NOT NULL;
