@@ -3,7 +3,6 @@ import { Hono } from "hono";
 import { tasksRouter } from "./endpoints/tasks";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { DummyEndpoint } from "./endpoints/dummyEndpoint";
-import { operationLogMiddleware } from "./middleware/operation-log";
 import { fromHono, collectRouteMapFromOpenapi } from "./from-hono";
 import { JsonParser } from "./middleware/json-parser";
 
@@ -51,7 +50,7 @@ app.onError((err, c) => {
 
 //Setup OpenAPI registry
 const openapi = fromHono(app, {
-	docs_url: '/', // 关键：禁用内置 UI
+	docs_url: '/',
 	schema: {
 		info: {
 			title: "My Awesome API",
