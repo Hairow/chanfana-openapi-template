@@ -1,4 +1,5 @@
 // src/middleware/json-parser.ts
+import { InputValidationException } from 'chanfana';
 import { MiddlewareHandler } from 'hono';
 import { cloneRawRequest } from 'hono/request';
 
@@ -10,16 +11,10 @@ export const JsonParser: MiddlewareHandler = async (c, next) => {
             const body = await clonedRequest.json();
             //如果json对象为空也提示错误
             if (!body || Object.keys(body).length === 0) {
-                return c.json({
-                    success: false,
-                    errors: [{ code: 7000, message: 'Request body is missing or empty' }],
-                }, 400);
+
             }
         } catch (error) {
-            return c.json({
-                success: false,
-                errors: [{ code: 7000, message: 'Invalid JSON format in request body' }],
-            }, 400);
+            throw new InputValidationException('Invalid JSON format in request body');
         }
     }
     await next();

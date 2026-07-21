@@ -1,4 +1,4 @@
-import { ApiException } from "chanfana";
+import { ApiException, InputValidationException } from "chanfana";
 import { Hono } from "hono";
 import { tasksRouter } from "./endpoints/tasks";
 import { ContentfulStatusCode } from "hono/utils/http-status";
@@ -14,14 +14,29 @@ const app = new Hono<{ Bindings: Env }>();
 app.use('*', JsonParser)
 
 app.onError((err, c) => {
+
+	console.error("Global error handler caught:", err);
+
+
 	if (err instanceof ApiException) {
 		return c.json(
-			{ success: false, errors: err.buildResponse() },
+			{
+				success: false,
+				errors: err.buildResponse()
+			},
 			err.status as ContentfulStatusCode,
 		);
 	}
 
-	console.error("Global error handler caught:", err);
+	if (err instanceof InputValidationException) {
+		return c.json(
+			{
+				success: false,
+				errors: [{ code: 7000, message: err.message }],
+			},
+			400,
+		);
+	}
 
 	return c.json(
 		{
