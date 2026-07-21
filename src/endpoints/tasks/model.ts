@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import { createSelectSchema } from 'drizzle-zod';
+import { tasks } from '../../db/schema';
 import { formatDateTime } from '../../utils/date';
 
 export const STATUS_MAP: Record<number, string> = {
@@ -11,23 +12,19 @@ export const STATUS_MAP: Record<number, string> = {
 
 export const getStatusText = (status: number) => STATUS_MAP[status] ?? "未知";
 
-//基础
-export const TaskBaseSchema = z.object({
-    id: z.number().int(),
-    name: z.string(),
-    slug: z.string(),
-    status: z.number(),
-    description: z.string(),
-    completed: z.boolean(),
-    due_date: z.string().transform(formatDateTime),
+// 基础（从 Drizzle 表定义自动生成，保持与数据库同步）
+const _base = createSelectSchema(tasks);
+
+export const TaskBaseSchema = _base.extend({
+    due_date: _base.shape.due_date.transform(formatDateTime),
 });
 
-//列表输出
+// 列表输出（从 TaskBaseSchema 提取并注入 status_text）
 export const TaskListSchema = TaskBaseSchema
     .pick({ id: true, status: true })
     .transform((data) => ({ ...data, status_text: getStatusText(data.status) }));
 
-//详情输出
+// 详情输出（从 TaskBaseSchema 提取并注入 status_text）
 export const TaskDetailSchema = TaskBaseSchema
     .pick({ id: true, status: true, name: true })
     .transform((data) => ({ ...data, status_text: getStatusText(data.status) }));
