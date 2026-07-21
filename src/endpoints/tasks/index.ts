@@ -6,7 +6,7 @@ import { AppContext } from "../../types";
 import { getDb } from "../../db";
 import { tasks } from "../../db/schema";
 import { TaskInsertValidator, TaskSelectValidator, TaskUpdateValidator } from "./validator";
-import { TaskListSchema, TaskDetailSchema } from "./model"
+import { TaskListSchema, TaskDetailSchema, TaskBaseSchema } from "./model"
 import { OperationLog, fromHono } from "../../from-hono";
 import { IdParam, PaginationResultInfo } from "../../utils/zod-utils";
 
@@ -121,7 +121,7 @@ class TaskCreate extends OpenAPIRoute {
 		responses: {
 			"201": {
 				description: "Returns the created task",
-				...contentJson(z.object({ success: z.boolean(), result: TaskListSchema })),
+				...contentJson(z.object({ success: z.boolean(), result: TaskDetailSchema })),
 			},
 		},
 	};
@@ -132,7 +132,7 @@ class TaskCreate extends OpenAPIRoute {
 		console.debug('data', data)
 		try {
 			const [inserted] = await db.insert(tasks).values(data.body).returning();
-			return c.json({ success: true, result: inserted }, 201);
+			return c.json({ success: true, result: TaskBaseSchema.parse(inserted) }, 201);
 		} catch (e: any) {
 			if (e.message?.includes("UNIQUE constraint failed")) {
 				return c.json(
@@ -161,7 +161,7 @@ class TaskUpdate extends OpenAPIRoute {
 		responses: {
 			"200": {
 				description: "Returns the updated task",
-				...contentJson(z.object({ success: z.boolean(), result: TaskListSchema })),
+				...contentJson(z.object({ success: z.boolean(), result: TaskDetailSchema })),
 			},
 		},
 	};
@@ -184,7 +184,7 @@ class TaskUpdate extends OpenAPIRoute {
 				.where(where)
 				.returning();
 
-			return c.json({ success: true, result: updated });
+			return c.json({ success: true, result: TaskDetailSchema.parse(updated) });
 		} catch (e: any) {
 			if (e.message?.includes("UNIQUE constraint failed")) {
 				throw new ApiException('A record with this unique value already exists')
@@ -207,7 +207,7 @@ class TaskDelete extends OpenAPIRoute {
 		responses: {
 			"200": {
 				description: "Returns the deleted task",
-				...contentJson(z.object({ success: z.boolean(), result: TaskListSchema })),
+				...contentJson(z.object({ success: z.boolean(), result: TaskDetailSchema })),
 			},
 		},
 	};
@@ -226,7 +226,7 @@ class TaskDelete extends OpenAPIRoute {
 			throw new ApiException("Task not found");
 		}
 
-		return c.json({ success: true, result: deleted });
+		return c.json({ success: true, result: TaskDetailSchema.parse(deleted) });
 	}
 }
 
