@@ -1,7 +1,7 @@
 import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 
 // ===================== Drizzle 表定义 =====================
-// zod schema 在 validation.ts 中，与此文件同步维护
+
 
 export const tasks = sqliteTable("tasks", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
