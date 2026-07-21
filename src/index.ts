@@ -13,6 +13,7 @@ const app = new Hono<{ Bindings: Env }>();
 //验证json格式
 app.use('*', JsonParser)
 
+//统一异常处理
 app.onError((err, c) => {
 
 	console.error("Global error handler caught:", err);
@@ -47,7 +48,7 @@ app.onError((err, c) => {
 	);
 });
 
-// Setup OpenAPI registry
+//Setup OpenAPI registry
 const openapi = fromHono(app, {
 	docs_url: "/",
 	schema: {
@@ -58,6 +59,7 @@ const openapi = fromHono(app, {
 		},
 	},
 });
+
 
 // Register Tasks Sub router
 openapi.route("/tasks", tasksRouter);
