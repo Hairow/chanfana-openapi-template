@@ -5,7 +5,7 @@ import { and, eq, like, or, sql } from "drizzle-orm";
 import { AppContext } from "../../types";
 import { getDb } from "../../db";
 import { tasks } from "../../db/schema";
-import { selectTaskSchema, insertTaskSchema, updateTaskSchema } from "./validation";
+import { selectTaskSchema, insertTaskSchema, updateTaskSchema } from "./validation1";
 import { authMiddleware } from "../../middleware/auth";
 import { OperationLog, fromHono } from "../../from-hono";
 
