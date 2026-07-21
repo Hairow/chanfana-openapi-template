@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import { PaginationParams } from '../../utils/zod-utils';
+import { createInsertSchema, createUpdateSchema, createSelectSchema } from 'drizzle-zod';
+import { tasks } from '../../db/schema';
 
 export const TaskSelectValidator = PaginationParams.extend({
     search: z.string().optional(),
@@ -26,3 +28,9 @@ export const TaskUpdateValidator = z.object({
     completed: z.boolean().optional().default(false),
     due_date: z.string().pipe(z.coerce.date()).transform((date) => date.toISOString()).optional(),
 });
+
+export const SimpleTaskInsertValidator = createInsertSchema(tasks)
+
+export const SimpleTaskUpdateValidator = createUpdateSchema(tasks)
+
+export const SimpleTaskSelectValidator = createSelectSchema(tasks)
