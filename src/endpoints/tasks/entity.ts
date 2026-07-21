@@ -13,9 +13,6 @@ export const STATUS_MAP: Record<number, string> = {
 
 export const getStatusText = (status: number) => STATUS_MAP[status] ?? "未知";
 
-// 基础（从 Drizzle 表定义自动生成，保持与数据库同步）
-const _base = createSelectSchema(tasks);
-
 export const TaskBaseSchema = z.object({
     id: z.number().int(),
     name: z.string(),
