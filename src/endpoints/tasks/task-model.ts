@@ -9,7 +9,9 @@ export const STATUS_MAP: Record<number, string> = {
     4: "已归档",
 };
 
-export const taskBaseSchema = z.object({
+export const getStatusText = (status: number) => STATUS_MAP[status] ?? "未知";
+
+export const TaskBaseSchema = z.object({
     id: z.number().int(),
     name: z.string(),
     slug: z.string(),
@@ -20,12 +22,12 @@ export const taskBaseSchema = z.object({
 });
 
 
-export const taskListSchema = taskBaseSchema
+export const TaskListSchema = TaskBaseSchema
     .pick({ id: true, status: true })
-    .transform((data) => ({ ...data, status_text: STATUS_MAP[data.status] ?? "未知" }));
+    .transform((data) => ({ ...data, status_text: getStatusText(data.status) }));
 
 
-export const taskDetailSchema = taskBaseSchema
+export const TaskDetailSchema = TaskBaseSchema
     .pick({ id: true, status: true, name: true })
-    .transform((data) => ({ ...data, status_text: STATUS_MAP[data.status] ?? "未知" }));
+    .transform((data) => ({ ...data, status_text: getStatusText(data.status) }));
 

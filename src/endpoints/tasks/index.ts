@@ -5,8 +5,8 @@ import { and, eq, like, or, sql } from "drizzle-orm";
 import { AppContext } from "../../types";
 import { getDb } from "../../db";
 import { tasks } from "../../db/schema";
-import { insertTaskSchema, updateTaskSchema } from "./validation1";
-import { taskListSchema, taskDetailSchema } from "./task-model"
+import { TaskInsertValidator, TaskSelectValidator, TaskUpdateValidator } from "./validation1";
+import { TaskListSchema, TaskDetailSchema } from "./task-model"
 import { OperationLog, fromHono } from "../../from-hono";
 import { IdParam, PaginationResultInfo, PaginationParams } from "../../utils/zod-utils";
 
@@ -16,12 +16,7 @@ class TaskList extends OpenAPIRoute {
 		tags: ["Tasks"],
 		summary: "List tasks with search, filter, and pagination",
 		request: {
-			query: PaginationParams.extend({
-				search: z.string().optional(),
-				completed: z.coerce.boolean().optional(),
-				order_by: z.enum(["id", "name", "slug", "due_date"]).default("id").optional(),
-				order_dir: z.enum(["asc", "desc"]).default("desc").optional(),
-			}),
+			query: TaskSelectValidator,
 		},
 		responses: {
 			"200": {
@@ -29,7 +24,7 @@ class TaskList extends OpenAPIRoute {
 				...contentJson(
 					z.object({
 						success: z.boolean(),
-						result: z.array(taskListSchema),
+						result: z.array(TaskListSchema),
 						result_info: PaginationResultInfo,
 					})
 				),
@@ -74,7 +69,7 @@ class TaskList extends OpenAPIRoute {
 
 		return c.json({
 			success: true,
-			result: rows.map((r) => taskListSchema.parse(r)),
+			result: rows.map((r) => TaskListSchema.parse(r)),
 			result_info: { count: rows.length, page, per_page, total_count: total },
 		});
 	}
@@ -92,7 +87,7 @@ class TaskRead extends OpenAPIRoute {
 		responses: {
 			"200": {
 				description: "Task found",
-				...contentJson(z.object({ success: z.boolean(), result: taskDetailSchema })),
+				...contentJson(z.object({ success: z.boolean(), result: TaskDetailSchema })),
 			},
 		},
 	};
@@ -101,13 +96,14 @@ class TaskRead extends OpenAPIRoute {
 		const db = getDb(c.env.DB);
 		const data = await this.getValidatedData<typeof this.schema>();
 
-		const [raw] = await db.select().from(tasks).where(eq(tasks.id, data.params.id)).limit(1);
+		const where = eq(tasks.id, data.params.id)
+		const [raw] = await db.select().from(tasks).where(where).limit(1);
 
 		if (!raw) {
 			throw new ApiException("Task not found");
 		}
 
-		return c.json({ success: true, result: taskDetailSchema.parse(raw) });
+		return c.json({ success: true, result: TaskDetailSchema.parse(raw) });
 	}
 }
 
@@ -120,12 +116,12 @@ class TaskCreate extends OpenAPIRoute {
 		tags: ["Tasks"],
 		summary: "Create a new task",
 		request: {
-			body: contentJson(insertTaskSchema),
+			body: contentJson(TaskInsertValidator),
 		},
 		responses: {
 			"201": {
 				description: "Returns the created task",
-				...contentJson(z.object({ success: z.boolean(), result: taskListSchema })),
+				...contentJson(z.object({ success: z.boolean(), result: TaskListSchema })),
 			},
 		},
 	};
@@ -160,12 +156,12 @@ class TaskUpdate extends OpenAPIRoute {
 		summary: "Update a task by ID",
 		request: {
 			params: IdParam,
-			body: contentJson(updateTaskSchema),
+			body: contentJson(TaskUpdateValidator),
 		},
 		responses: {
 			"200": {
 				description: "Returns the updated task",
-				...contentJson(z.object({ success: z.boolean(), result: taskListSchema })),
+				...contentJson(z.object({ success: z.boolean(), result: TaskListSchema })),
 			},
 		},
 	};
@@ -175,7 +171,8 @@ class TaskUpdate extends OpenAPIRoute {
 		const data = await this.getValidatedData<typeof this.schema>();
 		console.debug('data', data)
 
-		const [existing] = await db.select().from(tasks).where(eq(tasks.id, data.params.id)).limit(1);
+		const where = eq(tasks.id, data.body.id)
+		const [existing] = await db.select().from(tasks).where(where).limit(1);
 		if (!existing) {
 			throw new ApiException("Task not found");
 		}
@@ -184,7 +181,7 @@ class TaskUpdate extends OpenAPIRoute {
 			const [updated] = await db
 				.update(tasks)
 				.set(data.body)
-				.where(eq(tasks.id, data.params.id))
+				.where(where)
 				.returning();
 
 			return c.json({ success: true, result: updated });
@@ -210,7 +207,7 @@ class TaskDelete extends OpenAPIRoute {
 		responses: {
 			"200": {
 				description: "Returns the deleted task",
-				...contentJson(z.object({ success: z.boolean(), result: taskListSchema })),
+				...contentJson(z.object({ success: z.boolean(), result: TaskListSchema })),
 			},
 		},
 	};
@@ -219,9 +216,10 @@ class TaskDelete extends OpenAPIRoute {
 		const db = getDb(c.env.DB);
 		const data = await this.getValidatedData<typeof this.schema>();
 
+		const where = eq(tasks.id, data.params.id)
 		const [deleted] = await db
 			.delete(tasks)
-			.where(eq(tasks.id, data.params.id))
+			.where(where)
 			.returning();
 
 		if (!deleted) {
