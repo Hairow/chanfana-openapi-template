@@ -22,7 +22,7 @@ app.onError((err, c) => {
 		return c.json(
 			{
 				success: false,
-				errors: err.buildResponse()
+				error: { code: 7000, message: err.message },
 			},
 			err.status as ContentfulStatusCode,
 		);
@@ -32,7 +32,7 @@ app.onError((err, c) => {
 		return c.json(
 			{
 				success: false,
-				errors: [{ code: 7000, message: err.message }],
+				error: { code: 7000, message: err.message },
 			},
 			400,
 		);
@@ -41,7 +41,7 @@ app.onError((err, c) => {
 	return c.json(
 		{
 			success: false,
-			errors: [{ code: 7000, message: "Internal Server Error:" + err.message }],
+			error: { code: 7000, message: "Internal Server Error:" + err.message },
 		},
 		500,
 	);
