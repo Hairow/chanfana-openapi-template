@@ -8,7 +8,7 @@ export const selectTaskSchema = z.object({
     slug: z.string(),
     description: z.string(),
     completed: z.boolean(),
-    due_date: z.string().datetime(),
+    due_date: z.string().pipe(z.coerce.date()).transform((date) => date.toISOString()),
 });
 
 export const insertTaskSchema = z.object({
@@ -16,7 +16,7 @@ export const insertTaskSchema = z.object({
     slug: z.string(),
     description: z.string(),
     completed: z.boolean().optional().default(false),
-    due_date: z.string().datetime(),
+    due_date: z.string().pipe(z.coerce.date()).transform((date) => date.toISOString()),
 });
 
 export const updateTaskSchema = z.object({
@@ -24,5 +24,5 @@ export const updateTaskSchema = z.object({
     slug: z.string().optional(),
     description: z.string().optional(),
     completed: z.boolean().optional(),
-    due_date: z.string().datetime().optional(),
+    due_date: z.string().pipe(z.coerce.date()).transform((date) => date.toISOString()).optional(),
 });
