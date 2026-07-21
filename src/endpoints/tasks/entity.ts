@@ -25,11 +25,17 @@ export const TaskBaseSchema = z.object({
 
 // 列表输出（从 TaskBaseSchema 提取并注入 status_text）
 export const TaskListSchema = TaskBaseSchema
-    .pick({ id: true, status: true })
+    .extend({
+        status_text: z.string()
+    })
+    .pick({ id: true, status: true, status_text: true })
     .transform((data) => ({ ...data, status_text: getStatusText(data.status) }));
 
 // 详情输出（从 TaskBaseSchema 提取并注入 status_text）
 export const TaskDetailSchema = TaskBaseSchema
-    .pick({ id: true, status: true, name: true })
+    .extend({
+        status_text: z.string()
+    })
+    .pick({ id: true, status: true, name: true, status_text: true })
     .transform((data) => ({ ...data, status_text: getStatusText(data.status) }));
 
