@@ -11,6 +11,7 @@ export const STATUS_MAP: Record<number, string> = {
 
 export const getStatusText = (status: number) => STATUS_MAP[status] ?? "未知";
 
+//基础
 export const TaskBaseSchema = z.object({
     id: z.number().int(),
     name: z.string(),
@@ -21,12 +22,12 @@ export const TaskBaseSchema = z.object({
     due_date: z.string().transform(formatDateTime),
 });
 
-
+//列表输出
 export const TaskListSchema = TaskBaseSchema
     .pick({ id: true, status: true })
     .transform((data) => ({ ...data, status_text: getStatusText(data.status) }));
 
-
+//详情输出
 export const TaskDetailSchema = TaskBaseSchema
     .pick({ id: true, status: true, name: true })
     .transform((data) => ({ ...data, status_text: getStatusText(data.status) }));
