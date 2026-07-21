@@ -51,7 +51,9 @@ class TaskList extends OpenAPIRoute {
 
 		if (search) {
 			conditions.push(
-				or(like(tasks.name, `%${search}%`), like(tasks.slug, `%${search}%`), like(tasks.description, `%${search}%`))
+				or(like(tasks.name, `%${search}%`),
+					like(tasks.slug, `%${search}%`),
+					like(tasks.description, `%${search}%`))
 			);
 		}
 		if (completed !== undefined) {
