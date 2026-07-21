@@ -5,9 +5,13 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import { DummyEndpoint } from "./endpoints/dummyEndpoint";
 import { operationLogMiddleware } from "./middleware/operation-log";
 import { fromHono, collectRouteMapFromOpenapi } from "./from-hono";
+import { JsonParser } from "./middleware/json-parser";
 
 // Start a Hono app
 const app = new Hono<{ Bindings: Env }>();
+
+//验证json格式
+app.use('*', JsonParser)
 
 app.onError((err, c) => {
 	if (err instanceof ApiException) {
@@ -22,7 +26,7 @@ app.onError((err, c) => {
 	return c.json(
 		{
 			success: false,
-			errors: [{ code: 7000, message: "Internal Server Error" }],
+			errors: [{ code: 7000, message: "Internal Server Error:" + err.message }],
 		},
 		500,
 	);

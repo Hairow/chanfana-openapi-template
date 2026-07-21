@@ -101,7 +101,7 @@ class TaskCreate extends OpenAPIRoute {
 	async handle(c: AppContext) {
 		const db = getDb(c.env.DB);
 		const data = await this.getValidatedData<typeof this.schema>();
-
+		console.debug('data', data)
 		try {
 			const [inserted] = await db.insert(tasks).values(data.body).returning();
 			return c.json({ success: true, result: inserted }, 201);
@@ -169,6 +169,7 @@ class TaskUpdate extends OpenAPIRoute {
 	async handle(c: AppContext) {
 		const db = getDb(c.env.DB);
 		const data = await this.getValidatedData<typeof this.schema>();
+		console.debug('data', data)
 
 		const [existing] = await db.select().from(tasks).where(eq(tasks.id, data.params.id)).limit(1);
 		if (!existing) {
@@ -185,10 +186,7 @@ class TaskUpdate extends OpenAPIRoute {
 			return c.json({ success: true, result: updated });
 		} catch (e: any) {
 			if (e.message?.includes("UNIQUE constraint failed")) {
-				return c.json(
-					{ success: false, errors: [{ code: 7001, message: "A record with this unique value already exists" }] },
-					409
-				);
+				throw new ApiException('A record with this unique value already exists')
 			}
 			throw e;
 		}
@@ -234,7 +232,7 @@ class TaskDelete extends OpenAPIRoute {
 export const tasksRouter = fromHono(new Hono());
 
 // 路由级别中间件，对所有 /tasks/* 生效
-tasksRouter.use("*", authMiddleware);
+//tasksRouter.use("*", authMiddleware);
 
 tasksRouter.get("/", TaskList);
 tasksRouter.post("/", TaskCreate);
