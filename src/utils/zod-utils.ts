@@ -29,3 +29,13 @@ export const PaginationParams = z.object({
     page: z.coerce.number().int().positive().default(1),
     per_page: z.coerce.number().int().min(1).max(100).default(10),
 });
+
+/**
+ * 列表返回的分页信息
+ */
+export const PaginationResultInfo = z.object({
+    count: z.number(),
+    page: z.number(),
+    per_page: z.number(),
+    total_count: z.number(),
+})

@@ -8,7 +8,7 @@ import { tasks } from "../../db/schema";
 import { insertTaskSchema, updateTaskSchema } from "./validation1";
 import { taskListSchema, taskDetailSchema } from "./task-model"
 import { OperationLog, fromHono } from "../../from-hono";
-import { IdParam, PaginationParams } from "../../utils/zod-utils";
+import { IdParam, PaginationResultInfo, PaginationParams } from "../../utils/zod-utils";
 
 // ===================== Task List =====================
 class TaskList extends OpenAPIRoute {
@@ -30,12 +30,7 @@ class TaskList extends OpenAPIRoute {
 					z.object({
 						success: z.boolean(),
 						result: z.array(taskListSchema),
-						result_info: z.object({
-							count: z.number(),
-							page: z.number(),
-							per_page: z.number(),
-							total_count: z.number(),
-						}),
+						result_info: PaginationResultInfo,
 					})
 				),
 			},
@@ -79,11 +74,43 @@ class TaskList extends OpenAPIRoute {
 
 		return c.json({
 			success: true,
-			result: rows,
+			result: rows.map((r) => taskListSchema.parse(r)),
 			result_info: { count: rows.length, page, per_page, total_count: total },
 		});
 	}
 }
+
+
+// ===================== Task Read =====================
+class TaskRead extends OpenAPIRoute {
+	schema = {
+		tags: ["Tasks"],
+		summary: "Get a single task by ID",
+		request: {
+			params: IdParam,
+		},
+		responses: {
+			"200": {
+				description: "Task found",
+				...contentJson(z.object({ success: z.boolean(), result: taskDetailSchema })),
+			},
+		},
+	};
+
+	async handle(c: AppContext) {
+		const db = getDb(c.env.DB);
+		const data = await this.getValidatedData<typeof this.schema>();
+
+		const [raw] = await db.select().from(tasks).where(eq(tasks.id, data.params.id)).limit(1);
+
+		if (!raw) {
+			throw new ApiException("Task not found");
+		}
+
+		return c.json({ success: true, result: taskDetailSchema.parse(raw) });
+	}
+}
+
 
 // ===================== Task Create =====================
 class TaskCreate extends OpenAPIRoute {
@@ -122,35 +149,7 @@ class TaskCreate extends OpenAPIRoute {
 	}
 }
 
-// ===================== Task Read =====================
-class TaskRead extends OpenAPIRoute {
-	schema = {
-		tags: ["Tasks"],
-		summary: "Get a single task by ID",
-		request: {
-			params: IdParam,
-		},
-		responses: {
-			"200": {
-				description: "Task found",
-				...contentJson(z.object({ success: z.boolean(), result: taskDetailSchema })),
-			},
-		},
-	};
 
-	async handle(c: AppContext) {
-		const db = getDb(c.env.DB);
-		const data = await this.getValidatedData<typeof this.schema>();
-
-		const [task] = await db.select().from(tasks).where(eq(tasks.id, data.params.id)).limit(1);
-
-		if (!task) {
-			throw new ApiException("Task not found");
-		}
-
-		return c.json({ success: true, result: task });
-	}
-}
 
 // ===================== Task Update =====================
 class TaskUpdate extends OpenAPIRoute {
