@@ -57,7 +57,7 @@ class TaskList extends OpenAPIRoute {
 			);
 		}
 		if (completed !== undefined) {
-			conditions.push(sql`${tasks.completed} = ${completed}`);
+			conditions.push(eq(tasks.completed, completed));
 		}
 
 		const where = conditions.length ? and(...conditions) : undefined;
