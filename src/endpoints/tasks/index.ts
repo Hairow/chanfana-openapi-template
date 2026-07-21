@@ -8,7 +8,7 @@ import { tasks } from "../../db/schema";
 import { selectTaskSchema, insertTaskSchema, updateTaskSchema } from "./validation1";
 import { authMiddleware } from "../../middleware/auth";
 import { OperationLog, fromHono } from "../../from-hono";
-import { IdParam } from "../../utils/zod-utils";
+import { IdParam, PaginationParams } from "../../utils/zod-utils";
 
 // ===================== Task List =====================
 class TaskList extends OpenAPIRoute {
@@ -16,13 +16,11 @@ class TaskList extends OpenAPIRoute {
 		tags: ["Tasks"],
 		summary: "List tasks with search, filter, and pagination",
 		request: {
-			query: z.object({
-				page: z.coerce.number().int().min(1).optional().default(1),
-				per_page: z.coerce.number().int().min(1).max(100).optional().default(20),
+			query: PaginationParams.extend({
 				search: z.string().optional(),
 				completed: z.coerce.boolean().optional(),
-				order_by: z.enum(["id", "name", "slug", "due_date"]).optional().default("id"),
-				order_dir: z.enum(["asc", "desc"]).optional().default("desc"),
+				order_by: z.enum(["id", "name", "slug", "due_date"]).default("id").optional(),
+				order_dir: z.enum(["asc", "desc"]).default("desc").optional(),
 			}),
 		},
 		responses: {
