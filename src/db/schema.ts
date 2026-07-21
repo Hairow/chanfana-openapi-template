@@ -7,8 +7,8 @@ export const tasks = sqliteTable("tasks", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
 	name: text("name").notNull(),
 	slug: text("slug").notNull().unique(),
-	description: text("description").notNull(),
+	description: text("description").notNull().default(''),
 	// integer({ mode: "boolean" }) 自动处理 SQLite 0/1 ↔ JS true/false
 	completed: integer("completed", { mode: "boolean" }).notNull().default(false),
-	due_date: text("due_date").notNull(),
+	due_date: text("due_date").notNull().default(''),
 });

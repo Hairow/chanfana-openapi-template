@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "8b2da08c-4e61-4604-bc23-d74be279b9dd",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "998dff1d-73e9-4509-83d5-d90fcde23f4d",
+  "prevId": "8b2da08c-4e61-4604-bc23-d74be279b9dd",
   "tables": {
     "tasks": {
       "name": "tasks",
@@ -33,7 +33,8 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "''"
         },
         "completed": {
           "name": "completed",
@@ -48,7 +49,8 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "''"
         }
       },
       "indexes": {
