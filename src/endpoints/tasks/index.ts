@@ -1,7 +1,7 @@
 import { contentJson, OpenAPIRoute, ApiException } from "chanfana";
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, like, or, sql } from "drizzle-orm";
+import { and, eq, like, or, sql } from "drizzle-orm";
 import { AppContext } from "../../types";
 import { getDb } from "../../db";
 import { tasks } from "../../db/schema";
@@ -59,7 +59,7 @@ class TaskList extends OpenAPIRoute {
 			conditions.push(sql`${tasks.completed} = ${completed}`);
 		}
 
-		const where = conditions.length ? sql`${conditions.reduce((a, b) => sql`${a} AND ${b}`)}` : undefined;
+		const where = conditions.length ? and(...conditions) : undefined;
 
 		const [rows, [{ total }]] = await Promise.all([
 			db

@@ -9,9 +9,6 @@ import { fromHono, collectRouteMapFromOpenapi } from "./from-hono";
 // Start a Hono app
 const app = new Hono<{ Bindings: Env }>();
 
-// 全局操作日志中间件
-app.use("*", operationLogMiddleware);
-
 app.onError((err, c) => {
 	if (err instanceof ApiException) {
 		return c.json(
