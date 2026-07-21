@@ -59,16 +59,20 @@ class TaskList extends OpenAPIRoute {
 		}
 
 		const where = conditions.length ? and(...conditions) : undefined;
+		const orderBy = (order_dir === "desc" ?
+			sql`${tasks[order_by as keyof typeof tasks]} DESC`
+			: sql`${tasks[order_by as keyof typeof tasks]} ASC`)
 
 		const [rows, [{ total }]] = await Promise.all([
-			db
-				.select()
+			db.select()
 				.from(tasks)
 				.where(where)
-				.orderBy(order_dir === "desc" ? sql`${tasks[order_by]} DESC` : tasks[order_by])
+				.orderBy(orderBy)
 				.limit(per_page)
 				.offset((page - 1) * per_page),
-			db.select({ total: sql<number>`count(*)` }).from(tasks).where(where),
+			db.select({ total: sql<number>`count(*)` })
+				.from(tasks)
+				.where(where),
 		]);
 
 		return c.json({
