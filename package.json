@@ -16,8 +16,11 @@
 		"publish": true
 	},
 	"dependencies": {
+		"@libsql/client": "^0.17.4",
 		"chanfana": "2.8.3",
+		"dotenv": "^17.4.2",
 		"drizzle-orm": "^0.45.2",
+		"drizzle-zod": "^0.8.3",
 		"hono": "4.11.1",
 		"zod": "3.25.67"
 	},
@@ -34,9 +37,10 @@
 	"private": true,
 	"scripts": {
 		"cf-typegen": "wrangler types",
+		"db:studio": "drizzle-kit studio",
 		"db:generate": "drizzle-kit generate",
 		"predev": "wrangler d1 migrations apply DB --local",
-		"dev": "wrangler dev",
+		"dev": "wrangler dev --local",
 		"predeploy": "wrangler d1 migrations apply DB --remote",
 		"deploy": "wrangler deploy",
 		"prepare": "cp scripts/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit",

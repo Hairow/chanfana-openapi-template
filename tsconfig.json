@@ -1,15 +1,28 @@
 {
 	"compilerOptions": {
 		"target": "esnext",
-		"lib": ["esnext"],
+		"lib": [
+			"esnext"
+		],
 		"module": "esnext",
 		"moduleResolution": "bundler",
-		"types": ["@types/node", "./worker-configuration.d.ts"],
+		"types": [
+			"@types/node",
+			"./worker-configuration.d.ts"
+		],
 		"noEmit": true,
 		"isolatedModules": true,
 		"forceConsistentCasingInFileNames": true,
 		"skipLibCheck": true,
 		"strict": true
 	},
-	"include": ["src"]
+	"include": [
+		"src",
+		"drizzle.config.ts"
+	],
+	"exclude": [
+		"node_modules",
+		"dist",
+		".wrangler"
+	]
 }
