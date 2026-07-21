@@ -8,6 +8,7 @@ import { tasks } from "../../db/schema";
 import { selectTaskSchema, insertTaskSchema, updateTaskSchema } from "./validation1";
 import { authMiddleware } from "../../middleware/auth";
 import { OperationLog, fromHono } from "../../from-hono";
+import { IdParam } from "../../utils/zod-utils";
 
 // ===================== Task List =====================
 class TaskList extends OpenAPIRoute {
@@ -123,7 +124,7 @@ class TaskRead extends OpenAPIRoute {
 		tags: ["Tasks"],
 		summary: "Get a single task by ID",
 		request: {
-			params: z.object({ id: z.coerce.number().int() }),
+			params: IdParam,
 		},
 		responses: {
 			"200": {
@@ -155,7 +156,7 @@ class TaskUpdate extends OpenAPIRoute {
 		tags: ["Tasks"],
 		summary: "Update a task by ID",
 		request: {
-			params: z.object({ id: z.coerce.number().int() }),
+			params: IdParam,
 			body: contentJson(updateTaskSchema),
 		},
 		responses: {
@@ -201,7 +202,7 @@ class TaskDelete extends OpenAPIRoute {
 		tags: ["Tasks"],
 		summary: "Delete a task by ID",
 		request: {
-			params: z.object({ id: z.coerce.number().int() }),
+			params: IdParam,
 		},
 		responses: {
 			"200": {
