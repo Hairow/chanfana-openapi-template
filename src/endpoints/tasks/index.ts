@@ -5,10 +5,10 @@ import { and, eq, like, or, sql } from "drizzle-orm";
 import { AppContext } from "../../types";
 import { getDb } from "../../db";
 import { tasks } from "../../db/schema";
-import { TaskInsertValidator, TaskSelectValidator, TaskUpdateValidator } from "./validation1";
+import { TaskInsertValidator, TaskSelectValidator, TaskUpdateValidator } from "./validation";
 import { TaskListSchema, TaskDetailSchema } from "./task-model"
 import { OperationLog, fromHono } from "../../from-hono";
-import { IdParam, PaginationResultInfo, PaginationParams } from "../../utils/zod-utils";
+import { IdParam, PaginationResultInfo } from "../../utils/zod-utils";
 
 // ===================== Task List =====================
 class TaskList extends OpenAPIRoute {
