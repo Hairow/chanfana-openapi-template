@@ -7,6 +7,7 @@ import { operationLogMiddleware } from "./middleware/operation-log";
 import { fromHono, collectRouteMapFromOpenapi } from "./from-hono";
 import { JsonParser } from "./middleware/json-parser";
 
+
 // Start a Hono app
 const app = new Hono<{ Bindings: Env }>();
 
@@ -50,7 +51,7 @@ app.onError((err, c) => {
 
 //Setup OpenAPI registry
 const openapi = fromHono(app, {
-	docs_url: "/",
+	docs_url: '/', // 关键：禁用内置 UI
 	schema: {
 		info: {
 			title: "My Awesome API",
