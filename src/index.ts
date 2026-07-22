@@ -76,8 +76,8 @@ app.get('/test', async (c) => {
 	const [result] = await db.insert(users).values({
 		name: 'test',
 		email: 'test@example.com',
-	}).$returningId()
-	return c.text('Hello from /test! id=' + result.id)
+	})
+	return c.text('Hello from /test! id=' + result.insertId)
 });
 
 app.get('/test/list', async (c) => {
