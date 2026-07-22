@@ -1,7 +1,7 @@
 import { defineConfig } from "drizzle-kit";
-import "dotenv/config";  // ✅ 加载 .env 文件
+import "dotenv/config";
 
-export default defineConfig({
+const d1 = defineConfig({
 	// 只编辑这一个文件，migration 自动生成
 	schema: "./src/db/schema.ts",
 	out: "./migrations",
@@ -13,3 +13,17 @@ export default defineConfig({
 	verbose: true,
 	strict: true,
 });
+
+const mysql = defineConfig({
+	out: './migrations-mysql',
+	schema: './src/db-mysql/schema.ts',
+	dialect: 'mysql', // 关键：指定为 MySQL
+	dbCredentials: {
+		url: process.env.DATABASE_URL!,
+	},
+})
+
+
+export default d1
+
+//export default mysql

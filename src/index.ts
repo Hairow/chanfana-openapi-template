@@ -67,6 +67,11 @@ openapi.route("/tasks", tasksRouter);
 // Register other endpoints
 openapi.post("/dummy/:slug", DummyEndpoint);
 
+
+app.get('/test', (c) => {
+	return c.text('Hello from /test!')
+});
+
 // 路由注册完毕，基于 openapi.registry.definitions 自动收集 routeMap
 collectRouteMapFromOpenapi(openapi);
 

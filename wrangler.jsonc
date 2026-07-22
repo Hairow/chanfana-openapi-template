@@ -14,6 +14,12 @@
 			"database_id": "8578136b-3a1d-4543-b12c-88136633fe53"
 		}
 	],
+	"hyperdrive": [
+		{
+			"binding": "HYPERDRIVE",
+			"id": "7ba127854caa4d11a636ffdfa7fc1e9a"
+		}
+	],
 	"vars": {
 		"API_TOKEN": ""
 	}
