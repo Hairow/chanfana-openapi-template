@@ -8,7 +8,7 @@
 		"moduleResolution": "bundler",
 		"types": [
 			"@types/node",
-			"./worker-configuration.d.ts"
+			"@cloudflare/workers-types"
 		],
 		"noEmit": true,
 		"isolatedModules": true,

@@ -22,8 +22,5 @@
 			"id": "7ba127854caa4d11a636ffdfa7fc1e9a",
 			"localConnectionString": "mysql://root:root@127.0.0.1:3306/fnos_cf_demo"
 		}
-	],
-	"vars": {
-		"API_TOKEN": "" //占位
-	}
+	]
 }
