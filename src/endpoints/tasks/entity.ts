@@ -1,5 +1,3 @@
-import { createSelectSchema } from 'drizzle-zod';
-import { tasks } from '../../db/schema';
 import { formatDateTime } from '../../utils/date';
 import z from 'zod';
 
@@ -26,7 +24,7 @@ export const TaskBaseSchema = z.object({
 // 列表输出（从 TaskBaseSchema 提取并注入 status_text）
 export const TaskListSchema = TaskBaseSchema
     .extend({
-        status_text: z.string()
+        status_text: z.string().optional()  // optional：输入无需此字段，由 transform 计算
     })
     .pick({ id: true, status: true, status_text: true })
     .transform((data) => ({ ...data, status_text: getStatusText(data.status) }));
@@ -34,7 +32,7 @@ export const TaskListSchema = TaskBaseSchema
 // 详情输出（从 TaskBaseSchema 提取并注入 status_text）
 export const TaskDetailSchema = TaskBaseSchema
     .extend({
-        status_text: z.string()
+        status_text: z.string().optional()  // optional：输入无需此字段，由 transform 计算
     })
     .pick({ id: true, status: true, name: true, status_text: true })
     .transform((data) => ({ ...data, status_text: getStatusText(data.status) }));
