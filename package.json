@@ -45,7 +45,7 @@
 		"dev": "wrangler dev --local",
 		"predeploy": "wrangler d1 migrations apply DB --remote",
 		"deploy": "wrangler deploy",
-		"prepare": "cp scripts/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit",
+		"prepare": "node -e \"const fs=require('fs');fs.copyFileSync('scripts/pre-commit','.git/hooks/pre-commit');fs.chmodSync('.git/hooks/pre-commit',0o755)\"",
 		"schema": "NODE_OPTIONS=--no-deprecation npx chanfana",
 		"test": "wrangler deploy --dry-run && npx vitest run --config tests/vitest.config.mts"
 	}
