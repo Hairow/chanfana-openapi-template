@@ -15,6 +15,13 @@
       "when": 1784702285071,
       "tag": "0001_skinny_hellion",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1784702844605,
+      "tag": "0002_smooth_roxanne_simpson",
+      "breakpoints": true
     }
   ]
 }

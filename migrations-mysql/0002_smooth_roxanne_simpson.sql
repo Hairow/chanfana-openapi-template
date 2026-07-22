@@ -1,0 +1,1 @@
+ALTER TABLE `users` MODIFY COLUMN `deleted_at` timestamp NULL DEFAULT null;
