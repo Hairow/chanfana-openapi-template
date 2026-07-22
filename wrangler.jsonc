@@ -21,6 +21,7 @@
 		}
 	],
 	"vars": {
-		"API_TOKEN": ""
+		"API_TOKEN": "", //占位
+		"DATABASE_URL": "" //占位
 	}
 }

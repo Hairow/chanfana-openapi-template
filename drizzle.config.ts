@@ -7,7 +7,7 @@ const d1 = defineConfig({
 	out: "./migrations",
 	dialect: "sqlite",
 	dbCredentials: {
-		// D1 本地数据库的路径，通常在 .wrangler 目录下
+		// D1 本地数据库的路径，给 drizzle-kit studio 准备
 		url: "file:./.wrangler/state/v3/d1/miniflare-D1DatabaseObject/71f7a3160b0a8f132221a14114630e6bed6b2511f3ae1799e2b2001f7c04bd5b.sqlite",
 	},
 	verbose: true,
@@ -19,6 +19,7 @@ const mysql = defineConfig({
 	schema: './src/db-mysql/schema.ts',
 	dialect: 'mysql', // 关键：指定为 MySQL
 	dbCredentials: {
+		// generate 不连库，仅满足类型校验；实际连接在 scripts/migrate-mysql.ts 中处理
 		url: process.env.DATABASE_URL!,
 	},
 })
