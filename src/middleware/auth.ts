@@ -1,5 +1,5 @@
-import { Context, Next } from "hono";
-
+import { Next } from "hono";
+import type { AppContext } from "../types";
 
 function parseToken(header: string | undefined): string | null {
 	if (!header || !header.startsWith("Bearer ")) return null;
@@ -16,14 +16,14 @@ function timingSafeEqual(a: string, b: string): boolean {
 	return result === 0;
 }
 
-export function verifyToken(token: string, c: Context<{ Bindings: Env }>): boolean {
+export function verifyToken(token: string, c: AppContext): boolean {
 	// 未配置 API_TOKEN 时拒绝所有请求（安全默认）
 	const expected = c.env.API_TOKEN
 	if (!expected) return false;
 	return timingSafeEqual(token, expected);
 }
 
-export async function authMiddleware(c: Context<{ Bindings: Env }>, next: Next) {
+export async function authMiddleware(c: AppContext, next: Next) {
 	const token = parseToken(c.req.header("Authorization"));
 
 	if (!token || !verifyToken(token, c)) {
