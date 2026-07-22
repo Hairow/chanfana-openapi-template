@@ -5,6 +5,8 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import { DummyEndpoint } from "./endpoints/dummyEndpoint";
 import { fromHono, collectRouteMapFromOpenapi } from "./from-hono";
 import { JsonParser } from "./middleware/json-parser";
+import { getMysqlDb } from "./db-mysql";
+import { users } from "./db-mysql/schema";
 
 
 // Start a Hono app
@@ -68,8 +70,21 @@ openapi.route("/tasks", tasksRouter);
 openapi.post("/dummy/:slug", DummyEndpoint);
 
 
-app.get('/test', (c) => {
-	return c.text('Hello from /test!')
+app.get('/test', async (c) => {
+	const db = await getMysqlDb(c.env)
+	// 增加 users 一条数据
+	const [result] = await db.insert(users).values({
+		name: 'test',
+		email: 'test@example.com',
+	}).$returningId()
+	return c.text('Hello from /test! id=' + result.id)
+});
+
+app.get('/test/list', async (c) => {
+	const db = await getMysqlDb(c.env)
+	// 输出 user list
+	const userList = await db.select().from(users)
+	return c.json(userList)
 });
 
 // 路由注册完毕，基于 openapi.registry.definitions 自动收集 routeMap
