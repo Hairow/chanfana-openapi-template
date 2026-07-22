@@ -2,11 +2,6 @@ import { drizzle } from "drizzle-orm/mysql2";
 import { createConnection, type ConnectionOptions } from "mysql2/promise";
 import * as schema from "./schema";
 
-export interface Env {
-	HYPERDRIVE?: Hyperdrive; // 本地 dev 不可用
-	DATABASE_URL?: string;    // 本地 dev 直连
-}
-
 /**
  * 获取 MySQL Drizzle 客户端，自动适配运行环境
  * - 生产：检测到 HYPERDRIVE → 走 Hyperdrive 代理
