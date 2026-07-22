@@ -41,10 +41,14 @@ app.onError((err, c) => {
 		);
 	}
 
+	const cause = err instanceof Error ? err.cause : undefined
+	const message = cause instanceof Error
+		? `Internal Server Error: ${err.message} | cause: ${cause.message}`
+		: `Internal Server Error: ${err.message}`
 	return c.json(
 		{
 			success: false,
-			errors: [{ code: 7000, message: "Internal Server Error:" + err.message }],
+			errors: [{ code: 7000, message }],
 		},
 		500,
 	);
@@ -73,9 +77,10 @@ openapi.post("/dummy/:slug", DummyEndpoint);
 app.get('/test', async (c) => {
 	const db = await getMysqlDb(c.env)
 	// 增加 users 一条数据
+	const name = 'test_' + Date.now()
 	const [result] = await db.insert(users).values({
-		name: 'test',
-		email: 'test@example.com',
+		name,
+		email: name + '@example.com',
 	})
 	return c.text('Hello from /test! id=' + result.insertId)
 });
