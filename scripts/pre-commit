@@ -2,13 +2,36 @@
 # pre-commit: schema.ts 变更时自动运行 drizzle-kit generate
 # 安装：npm install 时会通过 prepare 脚本自动设置
 
-if git diff --cached --name-only | grep -q "^src/db/schema.ts$"; then
+D1_SCHEMA="src/db/schema.ts"
+MYSQL_SCHEMA="src/db-mysql/schema.ts"
+
+CHANGED=$(git diff --cached --name-only)
+
+D1_CHANGED=false
+MYSQL_CHANGED=false
+
+if echo "$CHANGED" | grep -q "^$D1_SCHEMA$"; then
+  D1_CHANGED=true
+fi
+
+if echo "$CHANGED" | grep -q "^$MYSQL_SCHEMA$"; then
+  MYSQL_CHANGED=true
+fi
+
+if $D1_CHANGED || $MYSQL_CHANGED; then
   echo "→ schema.ts 已变更，自动生成 migration..."
+fi
 
-  npx drizzle-kit generate
-
-  # 把新生成的 migration 文件加入暂存区
+if $D1_CHANGED; then
+  echo "  ▶ D1 schema"
+  npx drizzle-kit generate --config=drizzle.config.d1.ts
   git add migrations/
+  echo "  ✓ D1 migration 已生成并加入本次 commit"
+fi
 
-  echo "✓ migration 已生成并加入本次 commit"
+if $MYSQL_CHANGED; then
+  echo "  ▶ MySQL schema"
+  npx drizzle-kit generate --config=drizzle.config.ts
+  git add migrations-mysql/
+  echo "  ✓ MySQL migration 已生成并加入本次 commit"
 fi
