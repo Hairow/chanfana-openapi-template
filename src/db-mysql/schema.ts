@@ -7,5 +7,5 @@ export const users = mysqlTable("users", {
     email: varchar("email", { length: 255 }).notNull(),
     createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
     updateAt: timestamp("update_at").notNull().default(sql`CURRENT_TIMESTAMP`).onUpdateNow(),
-    deletedAt: timestamp("deleted_at").default(sql`null`),
+    deletedAt: int("deleted_at"),
 });
