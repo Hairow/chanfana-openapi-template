@@ -3,7 +3,10 @@
 import { migrate } from "drizzle-orm/mysql2/migrator";
 import { drizzle } from "drizzle-orm/mysql2";
 import { createConnection } from "mysql2/promise";
-import "dotenv/config";
+import { config } from "dotenv";
+
+// 支持通过 ENV_FILE 指定 env 文件，默认 .env
+config({ path: process.env.ENV_FILE || ".env" });
 
 async function main() {
 	const connection = await createConnection({
