@@ -24,6 +24,6 @@ const mysql = defineConfig({
 })
 
 
-export default d1
+//export default d1
 
-//export default mysql
+export default mysql
