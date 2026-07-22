@@ -7,6 +7,7 @@ import { fromHono, collectRouteMapFromOpenapi } from "./from-hono";
 import { JsonParser } from "./middleware/json-parser";
 import { getMysqlDb } from "./db-mysql";
 import { users } from "./db-mysql/schema";
+import { AppContext } from "./types";
 
 
 // Start a Hono app
@@ -16,7 +17,7 @@ const app = new Hono<{ Bindings: Env }>();
 app.use('*', JsonParser)
 
 //统一异常处理
-app.onError((err, c) => {
+app.onError((err, c: AppContext) => {
 
 	console.error("Global error handler caught:", err);
 
@@ -74,7 +75,7 @@ openapi.route("/tasks", tasksRouter);
 openapi.post("/dummy/:slug", DummyEndpoint);
 
 
-app.get('/test', async (c) => {
+app.get('/test', async (c: AppContext) => {
 	const db = await getMysqlDb(c.env)
 	// 增加 users 一条数据
 	const name = 'test_' + Date.now()
@@ -85,7 +86,7 @@ app.get('/test', async (c) => {
 	return c.text('Hello from /test! id=' + result.insertId)
 });
 
-app.get('/test/list', async (c) => {
+app.get('/test/list', async (c: AppContext) => {
 	const db = await getMysqlDb(c.env)
 	// 输出 user list
 	const userList = await db.select().from(users)
