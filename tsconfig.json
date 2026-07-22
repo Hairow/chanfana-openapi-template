@@ -18,7 +18,7 @@
 	},
 	"include": [
 		"src",
-		"drizzle.config.ts"
+		"drizzle.config.mysql.ts"
 	],
 	"exclude": [
 		"node_modules",

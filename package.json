@@ -38,7 +38,7 @@
 	"private": true,
 	"scripts": {
 		"cf-typegen": "wrangler types",
-		"db:generate": "drizzle-kit generate --config=drizzle.config.d1.ts && drizzle-kit generate --config=drizzle.config.ts",
+		"db:generate": "drizzle-kit generate --config=drizzle.config.d1.ts && drizzle-kit generate --config=drizzle.config.mysql.ts",
 		"db:mysql:migrate": "npx tsx scripts/migrate-mysql.ts",
 		"db:mysql:migrate_remote": "ENV_FILE=.env.prod npx tsx scripts/migrate-mysql.ts",
 		"predev": "wrangler d1 migrations apply DB --local",

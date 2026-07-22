@@ -31,7 +31,7 @@ fi
 
 if $MYSQL_CHANGED; then
   echo "  ▶ MySQL schema"
-  npx drizzle-kit generate --config=drizzle.config.ts
+  npx drizzle-kit generate --config=drizzle.config.mysql.ts
   git add migrations-mysql/
   echo "  ✓ MySQL migration 已生成并加入本次 commit"
 fi
