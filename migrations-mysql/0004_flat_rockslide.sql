@@ -1,2 +1,2 @@
-ALTER TABLE `users` MODIFY COLUMN `created_at` timestamp NOT NULL;--> statement-breakpoint
-ALTER TABLE `users` MODIFY COLUMN `update_at` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE `users` MODIFY COLUMN `created_at` timestamp  NULL default null;--> statement-breakpoint
+ALTER TABLE `users` MODIFY COLUMN `update_at` timestamp  NULL default null ON UPDATE CURRENT_TIMESTAMP;
