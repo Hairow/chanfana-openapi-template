@@ -40,6 +40,7 @@
 		"cf-typegen": "wrangler types",
 		"db:studio": "drizzle-kit studio",
 		"db:generate": "drizzle-kit generate",
+		"db:mysql:migrate": "npx tsx scripts/migrate-mysql.ts",
 		"predev": "wrangler d1 migrations apply DB --local",
 		"dev": "wrangler dev --local",
 		"predeploy": "wrangler d1 migrations apply DB --remote",
