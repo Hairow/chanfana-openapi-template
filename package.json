@@ -29,9 +29,11 @@
 		"@cloudflare/vitest-pool-workers": "0.11.1",
 		"@cloudflare/workers-types": "^5.20260722.1",
 		"@types/node": "24.10.1",
+		"@types/ssh2": "^1.15.5",
 		"@vitest/runner": "3.2.4",
 		"@vitest/snapshot": "3.2.4",
 		"drizzle-kit": "^0.31.10",
+		"ssh2": "^1.17.0",
 		"typescript": "5.9.3",
 		"vitest": "3.2.4",
 		"wrangler": "^4.112.0"
