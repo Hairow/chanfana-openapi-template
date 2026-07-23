@@ -173,15 +173,22 @@ function buildBody(config: FetchConfig): BodyInit | undefined {
     return config.body as BodyInit | undefined;
 }
 
-async function fetchWithTimeout(url: string, init: RequestInit, timeout: number): Promise<Response> {
-    const controller = new AbortController();
-    init.signal = controller.signal;
+async function fetchWithTimeout(url: string, init: RequestInit, timeout: number, externalSignal?: AbortSignal | null): Promise<Response> {
+    const timeoutController = new AbortController();
 
-    const timer = setTimeout(() => controller.abort(), timeout);
+    // 合并外部 signal 与超时 signal，任一触发即取消
+    const mergedSignal = externalSignal
+        ? AbortSignal.any([externalSignal, timeoutController.signal])
+        : timeoutController.signal;
+    init.signal = mergedSignal;
+
+    const timer = setTimeout(() => timeoutController.abort(), timeout);
     try {
         return await fetch(url, init);
     } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") {
+            // 外部取消 vs 超时取消
+            if (externalSignal?.aborted) throw new DOMException("Aborted", "AbortError");
             throw new TimeoutError(url, timeout);
         }
         throw err;
@@ -190,9 +197,12 @@ async function fetchWithTimeout(url: string, init: RequestInit, timeout: number)
     }
 }
 
-async function doFetch(finalUrl: string, init: RequestInit, timeout: number): Promise<Response> {
-    if (timeout <= 0) return fetch(finalUrl, init);
-    return fetchWithTimeout(finalUrl, init, timeout);
+async function doFetch(finalUrl: string, init: RequestInit, timeout: number, externalSignal?: AbortSignal | null): Promise<Response> {
+    if (timeout <= 0) {
+        if (externalSignal) init.signal = externalSignal;
+        return fetch(finalUrl, init);
+    }
+    return fetchWithTimeout(finalUrl, init, timeout, externalSignal);
 }
 
 // ── 续期锁 ────────────────────────────────────────────────
@@ -252,6 +262,7 @@ async function send<T>(
         json,
         form,
         timeout = 30_000,
+        signal,
         ...rest
     } = config;
 
@@ -267,7 +278,7 @@ async function send<T>(
 
     let response: Response;
     try {
-        response = await doFetch(finalUrl, init, timeout);
+        response = await doFetch(finalUrl, init, timeout, signal);
     } catch (err) {
         if (err instanceof TimeoutError) throw err;
         if (err instanceof TypeError && err.message === "Failed to fetch") {
