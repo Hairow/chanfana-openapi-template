@@ -83,9 +83,24 @@ export class TimeoutError extends Error {
 const BASE = ""; // 替换为 Worker 地址
 const CLOCK_SKEW = 30; // 时钟偏移缓冲（秒），提前 30s 视为过期
 
-let accessToken: string | null = null;
-let refreshToken: string | null = null;
+const ACCESS_TOKEN_KEY = "access_token";
+const REFRESH_TOKEN_KEY = "refresh_token";
+
+let accessToken: string | null = getStored(ACCESS_TOKEN_KEY);
+let refreshToken: string | null = getStored(REFRESH_TOKEN_KEY);
 let refreshPromise: Promise<void> | null = null;
+
+function getStored(key: string): string | null {
+    try { return localStorage.getItem(key); } catch { return null; }
+}
+
+function setStored(key: string, value: string): void {
+    try { localStorage.setItem(key, value); } catch { /* 无痕模式 / quota 满，静默失败 */ }
+}
+
+function clearStored(key: string): void {
+    try { localStorage.removeItem(key); } catch { /* ignore */ }
+}
 
 // ── 拦截器管理 ────────────────────────────────────────────
 
@@ -201,6 +216,7 @@ async function doRefresh(): Promise<void> {
         .then(async (res) => {
             if (!res.ok) {
                 refreshToken = null;
+                clearStored(REFRESH_TOKEN_KEY);
                 logout();
                 const body = (await res.json().catch(() => ({ success: false }))) as ApiResponse;
                 throw new Error(body.errors?.[0]?.message || "Token refresh failed");
@@ -208,6 +224,7 @@ async function doRefresh(): Promise<void> {
             const data = await res.json() as RefreshResponse;
             if (!data.accessToken) throw new Error("Invalid refresh response: missing accessToken");
             accessToken = data.accessToken;
+            setStored(ACCESS_TOKEN_KEY, data.accessToken);
         })
         .finally(() => {
             refreshPromise = null;
@@ -342,11 +359,15 @@ export async function login(sub: string) {
     }
     accessToken = data.accessToken;
     refreshToken = data.refreshToken;
+    setStored(ACCESS_TOKEN_KEY, data.accessToken);
+    setStored(REFRESH_TOKEN_KEY, data.refreshToken);
 }
 
 /** 退出登录 */
 export function logout() {
     accessToken = null;
     refreshToken = null;
+    clearStored(ACCESS_TOKEN_KEY);
+    clearStored(REFRESH_TOKEN_KEY);
     window.location.href = "/login";
 }
