@@ -20,9 +20,9 @@ export interface JwtPayload extends JWTPayload {
 	type: "access" | "refresh";
 }
 
-/** 从 API_TOKEN 生成 HMAC 密钥 */
+/** 从 TOKEN_SECRET 生成 HMAC 密钥 */
 function getSecret(env: Env) {
-	return new TextEncoder().encode(env.API_TOKEN);
+	return new TextEncoder().encode(env.TOKEN_SECRET);
 }
 
 /** 签发 access token（2h，用于 API 鉴权） */
@@ -30,7 +30,7 @@ export async function signAccessToken(env: Env, sub: string) {
 	return new SignJWT({ sub, type: "access" })
 		.setProtectedHeader({ alg: "HS256" })    // 签名算法
 		.setExpirationTime("2h")                  // exp：2 小时过期
-		.sign(getSecret(env));                    // 用 API_TOKEN 签名
+		.sign(getSecret(env));                    // 用 TOKEN_SECRET 签名
 }
 
 /** 签发 refresh token（7d，用于续期 access token） */
@@ -38,7 +38,7 @@ export async function signRefreshToken(env: Env, sub: string) {
 	return new SignJWT({ sub, type: "refresh" })
 		.setProtectedHeader({ alg: "HS256" })    // 签名算法
 		.setExpirationTime("7d")                  // exp：7 天过期
-		.sign(getSecret(env));                    // 用 API_TOKEN 签名
+		.sign(getSecret(env));                    // 用 TOKEN_SECRET 签名
 }
 
 /** 签发 access + refresh token 对 */
