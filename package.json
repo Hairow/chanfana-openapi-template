@@ -16,7 +16,6 @@
 		"publish": true
 	},
 	"dependencies": {
-		"@libsql/client": "^0.17.4",
 		"chanfana": "2.8.3",
 		"dotenv": "^17.4.2",
 		"drizzle-orm": "^0.45.2",
