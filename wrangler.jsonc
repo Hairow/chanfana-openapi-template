@@ -1,7 +1,9 @@
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
 	"compatibility_date": "2025-10-08",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
 	"main": "src/index.ts",
 	"name": "chanfana-openapi-template",
 	"preview_urls": false,
@@ -19,7 +21,7 @@
 	"hyperdrive": [
 		{
 			"binding": "HYPERDRIVE",
-			"id": "7ba127854caa4d11a636ffdfa7fc1e9a",
+			"id": "1134193d6ad54b80ae19f1922f95872c",
 			"localConnectionString": "mysql://root:root@127.0.0.1:3306/fnos_cf_demo"
 		}
 	]
