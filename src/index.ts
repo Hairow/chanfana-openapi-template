@@ -8,7 +8,7 @@ import { JsonParser } from "./middleware/json-parser";
 import { getMysqlDb } from "./db-mysql";
 import { users } from "./db-mysql/schema";
 import { AppContext } from "./types";
-import { signToken, authMiddleware } from "./middleware/auth";
+import { signTokenPair, signAccessToken, verifyRefreshToken, authMiddleware } from "./middleware/auth";
 
 
 // Start a Hono app
@@ -85,8 +85,22 @@ app.post('/login', async (c: AppContext) => {
 		throw new InputValidationException("Missing required field: sub")
 	}
 
-	const token = await signToken(c.env, body.sub);
-	return c.json({ success: true, token });
+	const pair = await signTokenPair(c.env, body.sub);
+	return c.json({ success: true, ...pair });
+});
+
+// 续期 access token（用 refresh token 换新的 access token）
+app.post('/refresh', async (c: AppContext) => {
+	const body = await c.req.json<{ refreshToken: string }>();
+
+	if (!body.refreshToken) {
+		throw new InputValidationException("Missing required field: refreshToken");
+	}
+
+	const payload = await verifyRefreshToken(c.env, body.refreshToken);
+	const accessToken = await signAccessToken(c.env, payload.sub);
+
+	return c.json({ success: true, accessToken });
 });
 
 // 需要鉴权才能访问
