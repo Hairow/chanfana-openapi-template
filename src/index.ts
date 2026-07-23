@@ -8,6 +8,7 @@ import { JsonParser } from "./middleware/json-parser";
 import { getMysqlDb } from "./db-mysql";
 import { users } from "./db-mysql/schema";
 import { AppContext } from "./types";
+import { signToken, authMiddleware } from "./middleware/auth";
 
 
 // Start a Hono app
@@ -86,7 +87,20 @@ app.get('/test', async (c: AppContext) => {
 	return c.text('Hello from /test! id=' + result.insertId)
 });
 
-app.get('/test/list', async (c: AppContext) => {
+// 签发 JWT
+app.post('/login', async (c: AppContext) => {
+	const body = await c.req.json<{ sub: string }>();
+
+	if (!body.sub) {
+		throw new InputValidationException("Missing required field: sub")
+	}
+
+	const token = await signToken(c.env, body.sub);
+	return c.json({ success: true, token });
+});
+
+// 需要鉴权才能访问
+app.get('/test/list', authMiddleware, async (c: AppContext) => {
 	const db = await getMysqlDb(c.env)
 	// 输出 user list
 	const userList = await db.select().from(users)
