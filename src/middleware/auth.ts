@@ -1,6 +1,16 @@
 import { SignJWT, jwtVerify } from "jose";
 import { Next } from "hono";
+import { ApiException } from "chanfana";
 import type { AppContext } from "../types";
+
+/** 鉴权异常：401，全局错误处理器统一处理 */
+export class AuthException extends ApiException {
+	status = 401;
+	constructor(code: number, message: string) {
+		super(message);
+		this.code = code;
+	}
+}
 
 /**
  * JWT payload 结构
@@ -40,19 +50,13 @@ export async function authMiddleware(c: AppContext, next: Next) {
 	const token = parseToken(c.req.header("Authorization"));
 
 	if (!token) {
-		return c.json(
-			{ success: false, errors: [{ code: 7002, message: "Unauthorized" }] },
-			401,
-		);
+		throw new AuthException(7002, "Unauthorized");
 	}
 
 	try {
 		await verifyToken(c.env, token);
 	} catch {
-		return c.json(
-			{ success: false, errors: [{ code: 7003, message: "Invalid or expired token" }] },
-			401,
-		);
+		throw new AuthException(7003, "Invalid or expired token");
 	}
 
 	await next();

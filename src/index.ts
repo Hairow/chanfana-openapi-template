@@ -33,16 +33,6 @@ app.onError((err, c: AppContext) => {
 		);
 	}
 
-	if (err instanceof InputValidationException) {
-		return c.json(
-			{
-				success: false,
-				errors: [{ code: 7000, message: err.message }],
-			},
-			400,
-		);
-	}
-
 	const cause = err instanceof Error ? err.cause : undefined
 	const message = cause instanceof Error
 		? `Internal Server Error: ${err.message} | cause: ${cause.message}`
