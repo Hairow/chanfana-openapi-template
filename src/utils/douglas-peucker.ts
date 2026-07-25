@@ -4,7 +4,7 @@
  * 计算球面上的垂直偏移距离（cross-track distance）。
  */
 
-interface Point {
+interface LngLat {
 	lng: number; // 经度
 	lat: number; // 纬度
 }
@@ -22,7 +22,7 @@ function clamp(value: number, min: number, max: number): number {
 /**
  * Haversine 公式计算两点间的大圆距离（米）
  */
-function haversineDistance(a: Point, b: Point): number {
+function haversineDistance(a: LngLat, b: LngLat): number {
 	const φ1 = toRad(a.lat);
 	const φ2 = toRad(b.lat);
 	const Δφ = toRad(b.lat - a.lat);
@@ -38,7 +38,7 @@ function haversineDistance(a: Point, b: Point): number {
 /**
  * 起始方位角（initial bearing），从 a 指向 b（弧度，范围 [-π, π]）
  */
-function initialBearing(a: Point, b: Point): number {
+function initialBearing(a: LngLat, b: LngLat): number {
 	const φ1 = toRad(a.lat);
 	const φ2 = toRad(b.lat);
 	const Δλ = toRad(b.lng - a.lng);
@@ -55,7 +55,7 @@ function initialBearing(a: Point, b: Point): number {
  * 点到大圆弧的垂直偏移距离（cross-track distance），单位米。
  * 若投影点落在弧段 AB 外侧，则返回点与最近端点的 Haversine 距离。
  */
-function perpendicularDistance(point: Point, start: Point, end: Point): number {
+function perpendicularDistance(point: LngLat, start: LngLat, end: LngLat): number {
 	const d_ab = haversineDistance(start, end);
 
 	// 线段退化为点
@@ -97,7 +97,7 @@ function perpendicularDistance(point: Point, start: Point, end: Point): number {
  * @param keepMask - 输出的保留标记
  */
 function douglasPeuckerRecursive(
-	points: Point[],
+	points: LngLat[],
 	start: number,
 	end: number,
 	epsilon: number,
@@ -156,7 +156,7 @@ function douglasPeuckerRecursive(
  * ];
  * douglasPeucker(track, 50);
  */
-export function douglasPeucker(points: readonly Point[], epsilon: number): Point[] {
+export function douglasPeucker(points: readonly LngLat[], epsilon: number): LngLat[] {
 	if (points.length <= 2) return [...points];
 
 	const keepMask = new Array<boolean>(points.length).fill(false);
