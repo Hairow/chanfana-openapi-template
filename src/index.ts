@@ -106,7 +106,7 @@ app.post('/refresh', async (c: AppContext) => {
 });
 
 // 需要鉴权才能访问
-app.get('/test/list', authMiddleware, async (c: AppContext) => {
+app.get('/test/list', async (c: AppContext) => {
 	const db = await getMysqlDb(c.env)
 	// 输出 user list
 	const userList = await db.select().from(users)
