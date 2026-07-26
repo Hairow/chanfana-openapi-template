@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>获取定位</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f0f2f5; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+  .card { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.08); padding: 32px 24px; width: 100%; max-width: 420px; }
+  h1 { font-size: 20px; text-align: center; margin-bottom: 24px; color: #1a1a1a; }
+  .info-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+  .info-item:last-child { border-bottom: none; }
+  .info-label { color: #888; width: 70px; flex-shrink: 0; }
+  .info-value { color: #333; word-break: break-all; flex: 1; }
+  .info-value.empty { color: #ccc; }
+  .btn { display: block; width: 100%; border: none; border-radius: 8px; padding: 12px; font-size: 16px; font-weight: 500; cursor: pointer; margin-top: 24px; transition: opacity .2s; }
+  .btn:active { opacity: .8; }
+  .btn.primary { background: #1677ff; color: #fff; }
+  .btn.primary.loading { background: #a0c4ff; pointer-events: none; }
+  .error { margin-top: 16px; padding: 12px; border-radius: 8px; background: #fff2f0; border: 1px solid #ffccc7; color: #ff4d4f; font-size: 13px; display: none; }
+  .error.show { display: block; }
+  .platform { text-align: center; font-size: 12px; color: #aaa; margin-bottom: 12px; }
+  .map-link { color: #1677ff; text-decoration: none; font-size: 13px; }
+  .timestamp { color: #aaa; font-size: 12px; text-align: center; margin-top: 16px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>📍 获取当前位置</h1>
+  <div class="platform" id="platform"></div>
+
+  <div class="info-item">
+    <span class="info-label">纬度</span>
+    <span class="info-value empty" id="lat">等待定位...</span>
+  </div>
+  <div class="info-item">
+    <span class="info-label">经度</span>
+    <span class="info-value empty" id="lng">等待定位...</span>
+  </div>
+  <div class="info-item">
+    <span class="info-label">精度</span>
+    <span class="info-value empty" id="accuracy">—</span>
+  </div>
+  <div class="info-item">
+    <span class="info-label">坐标系</span>
+    <span class="info-value">WGS84</span>
+  </div>
+  <div class="info-item">
+    <span class="info-label">高德地图</span>
+    <span class="info-value empty" id="amap-link">—</span>
+  </div>
+
+  <button class="btn primary" id="locateBtn" onclick="locate()">获取定位</button>
+  <div class="error" id="error"></div>
+  <div class="timestamp" id="timestamp"></div>
+</div>
+
+<script>
+function $(id) { return document.getElementById(id); }
+
+// 识别平台
+const ua = navigator.userAgent;
+const isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(ua);
+$('platform').textContent = isMobile ? '📱 移动端（GPS + 基站 + WiFi）' : '💻 桌面端（WiFi + IP）';
+
+function locate() {
+  const btn = $('locateBtn');
+  const errorEl = $('error');
+  errorEl.classList.remove('show');
+  btn.textContent = '定位中...';
+  btn.classList.add('loading');
+
+  if (!navigator.geolocation) {
+    showError('当前浏览器不支持定位');
+    return;
+  }
+
+  // 移动端用高精度，桌面端关了反而更快
+  const options = {
+    enableHighAccuracy: isMobile,
+    timeout: isMobile ? 10000 : 20000,
+    maximumAge: 60000,
+  };
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const { latitude, longitude, accuracy } = pos.coords;
+      renderResult(latitude, longitude, accuracy);
+      resetBtn();
+    },
+    (err) => {
+      switch (err.code) {
+        case err.PERMISSION_DENIED: showError('用户拒绝了定位请求，请在浏览器设置中允许定位权限'); break;
+        case err.POSITION_UNAVAILABLE: showError('无法获取位置信息，请检查网络/GPS'); break;
+        case err.TIMEOUT: showError('定位超时' + (isMobile ? '' : '，桌面端建议切换网络后重试')); break;
+        default: showError('定位失败: ' + err.message);
+      }
+      resetBtn();
+    },
+    options,
+  );
+}
+
+function renderResult(lat, lng, accuracy) {
+  $('lat').textContent = lat.toFixed(6);
+  $('lat').classList.remove('empty');
+  $('lng').textContent = lng.toFixed(6);
+  $('lng').classList.remove('empty');
+  $('accuracy').textContent = accuracy != null ? `± ${accuracy.toFixed(1)} 米` : '—';
+  $('accuracy').classList.remove('empty');
+
+  // 高德地图链接
+  $('amap-link').innerHTML =
+    `<a class="map-link" href="https://uri.amap.com/marker?position=${lng},${lat}" target="_blank">在高德地图中查看 ↗</a>`;
+  $('amap-link').classList.remove('empty');
+
+  $('timestamp').textContent = new Date().toLocaleString();
+}
+
+function showError(msg) {
+  const el = $('error');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+function resetBtn() {
+  const btn = $('locateBtn');
+  btn.textContent = '重新获取';
+  btn.classList.remove('loading');
+}
+</script>
+</body>
+</html>

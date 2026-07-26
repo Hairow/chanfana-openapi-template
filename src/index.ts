@@ -9,6 +9,8 @@ import { getMysqlDb } from "./db-mysql";
 import { users } from "./db-mysql/schema";
 import { AppContext } from "./types";
 import { signTokenPair, signAccessToken, verifyRefreshToken, authMiddleware } from "./middleware/auth";
+// @ts-ignore wrangler/esbuild 支持直接 import HTML 为字符串
+import locationPage from "./location.html";
 
 
 // Start a Hono app
@@ -109,6 +111,11 @@ app.get('/test/list', authMiddleware, async (c: AppContext) => {
 	// 输出 user list
 	const userList = await db.select().from(users)
 	return c.json(userList)
+});
+
+// 定位页面
+app.get('/location', (c: AppContext) => {
+	return c.html(locationPage);
 });
 
 // 路由注册完毕，基于 openapi.registry.definitions 自动收集 routeMap
