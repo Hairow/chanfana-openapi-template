@@ -24,5 +24,14 @@
 			"id": "1134193d6ad54b80ae19f1922f95872c",
 			"localConnectionString": "mysql://root:root@127.0.0.1:3306/fnos_cf_demo"
 		}
+	],
+	"rules": [
+		{
+			"type": "Text",
+			"globs": [
+				"**/*.html"
+			],
+			"fallthrough": false
+		}
 	]
 }

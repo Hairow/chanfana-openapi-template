@@ -10,7 +10,7 @@ import { users } from "./db-mysql/schema";
 import { AppContext } from "./types";
 import { signTokenPair, signAccessToken, verifyRefreshToken, authMiddleware } from "./middleware/auth";
 // @ts-ignore wrangler/esbuild 支持直接 import HTML 为字符串
-import locationPage from "./location.html";
+import locationPage from "./client/location.html";
 
 
 // Start a Hono app
