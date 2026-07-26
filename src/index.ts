@@ -11,7 +11,8 @@ import { AppContext } from "./types";
 import { signTokenPair, signAccessToken, verifyRefreshToken, authMiddleware } from "./middleware/auth";
 // @ts-ignore wrangler/esbuild 支持直接 import HTML 为字符串
 import locationPage from "./client/location.html";
-
+// @ts-ignore
+import signPage from "./client/index.html";
 
 // Start a Hono app
 const app = new Hono<{ Bindings: Env }>();
@@ -117,6 +118,11 @@ app.get('/test/list', async (c: AppContext) => {
 app.get('/location', (c: AppContext) => {
 	return c.html(locationPage);
 });
+
+//浏览器签名
+app.get('/sign', (c: AppContext) => {
+	return c.html(signPage)
+})
 
 // 路由注册完毕，基于 openapi.registry.definitions 自动收集 routeMap
 collectRouteMapFromOpenapi(openapi);
