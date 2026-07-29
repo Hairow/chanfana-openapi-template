@@ -22,6 +22,7 @@ export async function operationLogMiddleware(c: Context, next: Next) {
 		.join("")
 		.replace(/\/{2,}/g, "/") || "/";
 	const method = c.req.method;
+	//根据 method和path 获取对应的类构造器
 	const cls = routeMap.get(`${method}:${fullPath}`);
 	const opLog = cls
 		? (cls as typeof cls & { operationLog?: OperationLog }).operationLog

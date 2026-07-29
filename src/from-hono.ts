@@ -77,6 +77,7 @@ export function collectRouteMapFromOpenapi(
 			"",
 		);
 
+		//根据classname获取类构造器，并存入routeMap
 		const cls = globalClassRegistry.get(className);
 		if (cls) {
 			const honoPath = path.replace(/\{(\w+)\}/g, ":$1");
