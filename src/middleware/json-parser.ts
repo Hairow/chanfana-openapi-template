@@ -8,13 +8,20 @@ export const JsonParser: MiddlewareHandler = async (c, next) => {
         try {
             // 手动解析 JSON，如果失败则立即返回错误
             const clonedRequest = await cloneRawRequest(c.req)
-            const body = await clonedRequest.json();
-            //如果json对象为空也提示错误
-            if (!body || Object.keys(body).length === 0) {
 
+            if (clonedRequest.body) {
+                const body = await clonedRequest.json();
+                //如果json对象为空也提示错误
+                if (!body || Object.keys(body).length === 0) {
+                    //转化成空对象{} 是否应该抛出异常
+                }
+            } else {
+                //输出为空是否应该抛出异常
             }
+
         } catch (error) {
-            throw new InputValidationException('Invalid JSON format in request body');
+            throw error
+            //throw new InputValidationException('Invalid JSON format in request body');
         }
     }
     await next();
