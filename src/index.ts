@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { tasksRouter } from "./endpoints/tasks";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { DummyEndpoint } from "./endpoints/dummyEndpoint";
-import { fromHono, RouteMapCollector } from "./from-hono";
+import { fromHono } from "./from-hono";
 import { JsonParser } from "./middleware/json-parser";
 import { getMysqlDb } from "./db-mysql";
 import { users } from "./db-mysql/schema";
@@ -123,9 +123,6 @@ app.get('/location', (c: AppContext) => {
 app.get('/sign', (c: AppContext) => {
 	return c.html(signPage)
 });
-
-// 路由注册完毕，基于 openapi.registry.definitions 自动收集 routeMap
-(openapi as unknown as RouteMapCollector).collectRouteMapFromOpenapi();
 
 // Export the Hono app
 export default app;

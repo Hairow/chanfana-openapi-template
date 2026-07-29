@@ -8,9 +8,6 @@ export interface OperationLog {
 /** OpenAPIRoute 子类构造函数类型 */
 type RouteClass = new (...args: any[]) => OpenAPIRoute;
 
-/** 全局 className → OpenAPIRoute 子类注册表 */
-const globalClassRegistry = new Map<string, RouteClass>();
-
 /** 路由 → OpenAPIRoute 子类，供中间件读取 */
 export const routeMap = new Map<string, RouteClass>();
 
@@ -20,64 +17,21 @@ const HTTP_METHODS = new Set([
 ]);
 
 /**
- * 包装 chanfana 的 fromHono，自动拦截路由注册以捕获所有 OpenAPIRoute 子类。
- * 用法与 chanfana 的 fromHono 完全一致，直接替换 import 来源即可。
- */
-/** Proxy 注入的方法，调用方可 (openapi as unknown as RouteMapCollector).collectRouteMapFromOpenapi() */
-export interface RouteMapCollector {
-	collectRouteMapFromOpenapi(): void;
-}
-
-/**
  * 包装 chanfana 的 fromHono，自动拦截路由注册以捕获所有 OpenAPIRoute 子类，
- * 并注入 collectRouteMapFromOpenapi() 方法。
+ * 并在注册时直接填充 routeMap。
  * 用法与 chanfana 的 fromHono 完全一致，直接替换 import 来源即可。
  */
 const wrapFromHono: typeof _fromHono = ((...args: any[]) => {
 	const openapi = _fromHono(...args as Parameters<typeof _fromHono>);
 
-	/** 基于 openapi.registry.definitions 自动收集路由对应的 OpenAPIRoute 子类到 routeMap */
-	function collectRouteMap() {
-		const definitions = (openapi.registry.definitions as Array<{
-			type: string;
-			route?: {
-				method: string;
-				path: string;
-				operationId?: string;
-			};
-		}>);
-
-		for (const def of definitions) {
-			if (def.type !== "route" || !def.route?.operationId) continue;
-
-			const { method, path, operationId } = def.route;
-
-			// "post_TaskCreate" → "TaskCreate"
-			const className = operationId.replace(
-				/^(get|post|put|delete|patch|head|options|all|trace)_/i,
-				"",
-			);
-
-			const cls = globalClassRegistry.get(className);
-			if (cls) {
-				const honoPath = path.replace(/\{(\w+)\}/g, ":$1");
-				routeMap.set(`${method.toUpperCase()}:${honoPath}`, cls);
-			}
-		}
-	}
-
 	return new Proxy(openapi, {
 		get(target: any, prop, receiver) {
-			// 支持 openapi.collectRouteMapFromOpenapi() 调用
-			if (prop === "collectRouteMapFromOpenapi") {
-				return collectRouteMap;
-			}
-
 			if (typeof prop === "string" && HTTP_METHODS.has(prop)) {
 				return (path: string, ...handlers: any[]) => {
 					for (const h of handlers) {
 						if (h.isRoute) {
-							globalClassRegistry.set(h.name, h);
+							// 注册时直接填入 routeMap，无需事后收集
+							routeMap.set(`${prop.toUpperCase()}:${path}`, h);
 						}
 					}
 					return target[prop](path, ...handlers);
