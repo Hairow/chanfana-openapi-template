@@ -16,12 +16,11 @@ export const JsonParser: MiddlewareHandler = async (c, next) => {
                     //转化成空对象{} 是否应该抛出异常
                 }
             } else {
-                //输出为空是否应该抛出异常
+                //请求体为空是否应该抛出异常
             }
 
         } catch (error) {
-            throw error
-            //throw new InputValidationException('Invalid JSON format in request body');
+            throw new InputValidationException('Invalid JSON format in request body');
         }
     }
     await next();
