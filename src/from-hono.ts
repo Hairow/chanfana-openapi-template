@@ -23,11 +23,56 @@ const HTTP_METHODS = new Set([
  * 包装 chanfana 的 fromHono，自动拦截路由注册以捕获所有 OpenAPIRoute 子类。
  * 用法与 chanfana 的 fromHono 完全一致，直接替换 import 来源即可。
  */
+/** Proxy 注入的方法，调用方可 (openapi as unknown as RouteMapCollector).collectRouteMapFromOpenapi() */
+export interface RouteMapCollector {
+	collectRouteMapFromOpenapi(): void;
+}
+
+/**
+ * 包装 chanfana 的 fromHono，自动拦截路由注册以捕获所有 OpenAPIRoute 子类，
+ * 并注入 collectRouteMapFromOpenapi() 方法。
+ * 用法与 chanfana 的 fromHono 完全一致，直接替换 import 来源即可。
+ */
 const wrapFromHono: typeof _fromHono = ((...args: any[]) => {
 	const openapi = _fromHono(...args as Parameters<typeof _fromHono>);
 
+	/** 基于 openapi.registry.definitions 自动收集路由对应的 OpenAPIRoute 子类到 routeMap */
+	function collectRouteMap() {
+		const definitions = (openapi.registry.definitions as Array<{
+			type: string;
+			route?: {
+				method: string;
+				path: string;
+				operationId?: string;
+			};
+		}>);
+
+		for (const def of definitions) {
+			if (def.type !== "route" || !def.route?.operationId) continue;
+
+			const { method, path, operationId } = def.route;
+
+			// "post_TaskCreate" → "TaskCreate"
+			const className = operationId.replace(
+				/^(get|post|put|delete|patch|head|options|all|trace)_/i,
+				"",
+			);
+
+			const cls = globalClassRegistry.get(className);
+			if (cls) {
+				const honoPath = path.replace(/\{(\w+)\}/g, ":$1");
+				routeMap.set(`${method.toUpperCase()}:${honoPath}`, cls);
+			}
+		}
+	}
+
 	return new Proxy(openapi, {
 		get(target: any, prop, receiver) {
+			// 支持 openapi.collectRouteMapFromOpenapi() 调用
+			if (prop === "collectRouteMapFromOpenapi") {
+				return collectRouteMap;
+			}
+
 			if (typeof prop === "string" && HTTP_METHODS.has(prop)) {
 				return (path: string, ...handlers: any[]) => {
 					for (const h of handlers) {
@@ -49,39 +94,3 @@ const wrapFromHono: typeof _fromHono = ((...args: any[]) => {
 }) as typeof _fromHono;
 
 export { wrapFromHono as fromHono };
-
-/**
- * 基于 openapi.registry.definitions 自动收集路由对应的 OpenAPIRoute 子类到 routeMap。
- * 在 openapi.route() / openapi.get() 等全部注册完毕后调用一次。
- */
-export function collectRouteMapFromOpenapi(
-	openapi: { registry: { definitions: unknown } },
-) {
-	const definitions = (openapi.registry.definitions as Array<{
-		type: string;
-		route?: {
-			method: string;
-			path: string;
-			operationId?: string;
-		};
-	}>);
-
-	for (const def of definitions) {
-		if (def.type !== "route" || !def.route?.operationId) continue;
-
-		const { method, path, operationId } = def.route;
-
-		// "post_TaskCreate" → "TaskCreate"
-		const className = operationId.replace(
-			/^(get|post|put|delete|patch|head|options|all|trace)_/i,
-			"",
-		);
-
-		//根据classname获取类构造器，并存入routeMap
-		const cls = globalClassRegistry.get(className);
-		if (cls) {
-			const honoPath = path.replace(/\{(\w+)\}/g, ":$1");
-			routeMap.set(`${method.toUpperCase()}:${honoPath}`, cls);
-		}
-	}
-}
