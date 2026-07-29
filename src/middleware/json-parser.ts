@@ -13,10 +13,10 @@ export const JsonParser: MiddlewareHandler = async (c, next) => {
                 const body = await clonedRequest.json();
                 //如果json对象为空也提示错误
                 if (!body || Object.keys(body).length === 0) {
-                    //转化成空对象{} 是否应该抛出异常
+                    //转化成空对象{} 不应该抛出异常
                 }
             } else {
-                //请求体为空是否应该抛出异常
+                //请求体为空不应该抛出异常
             }
 
         } catch (error) {
