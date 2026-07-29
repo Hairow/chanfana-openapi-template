@@ -33,7 +33,6 @@
 		"@vitest/runner": "3.2.4",
 		"@vitest/snapshot": "3.2.4",
 		"drizzle-kit": "^0.31.10",
-		"openapi-typescript": "^7.13.0",
 		"ssh2": "^1.17.0",
 		"typescript": "5.9.3",
 		"vitest": "3.2.4",
@@ -50,7 +49,6 @@
 		"deploy": "wrangler deploy",
 		"prepare": "node scripts/prepare.cjs",
 		"schema": "NODE_OPTIONS=--no-deprecation npx chanfana",
-		"gen:types": "npx tsx scripts/gen-api-types.ts",
 		"test": "wrangler deploy --dry-run && npx vitest run --config tests/vitest.config.mts"
 	}
 }
