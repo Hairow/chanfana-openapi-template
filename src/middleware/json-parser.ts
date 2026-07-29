@@ -1,25 +1,21 @@
 // src/middleware/json-parser.ts
 import { InputValidationException } from 'chanfana';
 import { MiddlewareHandler } from 'hono';
-import { cloneRawRequest } from 'hono/request';
 
 export const JsonParser: MiddlewareHandler = async (c, next) => {
     if (c.req.header('Content-Type')?.includes('application/json')) {
+        // 先检查 body 是否有内容，避免空 body 触发 clone/parse 异常
+        // chanfana 生成 schema 时会发空 body 的探测请求，应放过
+        const contentLength = c.req.header('Content-Length');
+        if (!contentLength || parseInt(contentLength) === 0) {
+            return await next();
+        }
+
         try {
-            // 手动解析 JSON，如果失败则立即返回错误
-            const clonedRequest = await cloneRawRequest(c.req)
-
-            if (clonedRequest.body) {
-                const body = await clonedRequest.json();
-                //如果json对象为空也提示错误
-                if (!body || Object.keys(body).length === 0) {
-                    //转化成空对象{} 不应该抛出异常
-                }
-            } else {
-                //请求体为空不应该抛出异常
-            }
-
-        } catch (error) {
+            // clone 一份 body 用于预校验，不消费原始 body
+            const cloned = c.req.raw.clone();
+            await cloned.json();
+        } catch {
             throw new InputValidationException('Invalid JSON format in request body');
         }
     }
