@@ -26,16 +26,18 @@ export const UuidParam = z.object({
  * 通用的分页参数
  */
 export const PaginationParams = z.object({
-    page: z.coerce.number().int().positive().default(1),
-    per_page: z.coerce.number().int().min(1).max(100).default(10),
+    page: z.coerce.number().int().positive().default(1)
+        .describe('页码，从 1 开始'),
+    per_page: z.coerce.number().int().min(1).max(100).default(10)
+        .describe('每页条数，范围 1-100'),
 });
 
 /**
  * 列表返回的分页信息
  */
 export const PaginationResultInfo = z.object({
-    count: z.number(),
-    page: z.number(),
-    per_page: z.number(),
-    total_count: z.number(),
+    count: z.number().describe('当前页返回条数'),
+    page: z.number().describe('当前页码'),
+    per_page: z.number().describe('每页条数'),
+    total_count: z.number().describe('总条数'),
 })
