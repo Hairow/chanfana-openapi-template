@@ -200,3 +200,5 @@ dist
 
 schema.json
 openapi.json
+
+.codegraph
