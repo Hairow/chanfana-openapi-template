@@ -1,7 +1,7 @@
 import { SignJWT, jwtVerify, JWTPayload } from "jose";
 import { MiddlewareHandler, Next } from "hono";
 import { ApiException } from "chanfana";
-import type { AppContext } from "../types";
+import type { AppBindings } from "../types";
 
 /** 鉴权异常：401，全局错误处理器统一处理 */
 export class AuthException extends ApiException {
@@ -80,7 +80,7 @@ function parseToken(header: string | undefined): string | null {
 }
 
 /** 鉴权中间件（只接受 access token） */
-export const authMiddleware: MiddlewareHandler<{ Bindings: Env }>
+export const authMiddleware: MiddlewareHandler<AppBindings>
 	= async (c, next) => {
 		const token = parseToken(c.req.header("Authorization"));
 

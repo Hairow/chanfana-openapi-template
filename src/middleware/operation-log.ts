@@ -2,13 +2,14 @@ import { Context, MiddlewareHandler } from "hono";
 import { matchedRoutes } from "hono/route";
 import { routeMap } from "../from-hono";
 import type { OperationLog } from "../from-hono";
+import { AppBindings } from "../types";
 
 /**
  * 全局操作日志中间件。
  * 通过 matchedRoutes 获取匹配的路由，从 routeMap 取出对应的 OpenAPIRoute 子类，
  * 读取其 static operationLog 输出日志。
  */
-export const operationLogMiddleware: MiddlewareHandler<{ Bindings: Env }>
+export const operationLogMiddleware: MiddlewareHandler<AppBindings>
 	= async (c, next) => {
 		const start = Date.now();
 		await next();

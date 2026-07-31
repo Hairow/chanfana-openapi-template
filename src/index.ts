@@ -7,7 +7,7 @@ import { fromHono } from "./from-hono";
 import { JsonParserMiddleware } from "./middleware/json-parser";
 import { getMysqlDb } from "./db-mysql";
 import { users } from "./db-mysql/schema";
-import { AppContext } from "./types";
+import { AppContext, AppBindings } from "./types";
 import { signTokenPair, signAccessToken, verifyRefreshToken, authMiddleware } from "./middleware/auth";
 // @ts-ignore wrangler/esbuild 支持直接 import HTML 为字符串
 import locationPage from "./client/location.html";
@@ -15,7 +15,7 @@ import locationPage from "./client/location.html";
 import signPage from "./client/index.html";
 
 // Start a Hono app
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono<AppBindings>();
 
 //验证json格式
 app.use('*', JsonParserMiddleware)

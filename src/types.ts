@@ -1,4 +1,5 @@
 import type { Context } from "hono";
 
-export type AppContext = Context<{ Bindings: Env }>;
+export type AppBindings = { Bindings: Env };
+export type AppContext = Context<AppBindings>;
 export type HandleArgs = [AppContext];

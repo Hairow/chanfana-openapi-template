@@ -1,9 +1,9 @@
 // src/middleware/json-parser.ts
 import { InputValidationException } from 'chanfana';
 import { MiddlewareHandler } from 'hono';
-import { AppContext } from '../types';
+import { AppBindings } from '../types';
 
-export const JsonParserMiddleware: MiddlewareHandler<{ Bindings: Env }>
+export const JsonParserMiddleware: MiddlewareHandler<AppBindings>
     = async (c, next) => {
         if (c.req.header('Content-Type')?.includes('application/json')) {
             // 只有body中有内容时候才检测json格式
