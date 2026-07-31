@@ -1,5 +1,5 @@
 import { SignJWT, jwtVerify, JWTPayload } from "jose";
-import { Next } from "hono";
+import { MiddlewareHandler, Next } from "hono";
 import { ApiException } from "chanfana";
 import type { AppContext } from "../types";
 
@@ -80,19 +80,20 @@ function parseToken(header: string | undefined): string | null {
 }
 
 /** 鉴权中间件（只接受 access token） */
-export async function authMiddleware(c: AppContext, next: Next) {
-	const token = parseToken(c.req.header("Authorization"));
+export const authMiddleware: MiddlewareHandler<{ Bindings: Env }>
+	= async (c, next) => {
+		const token = parseToken(c.req.header("Authorization"));
 
-	if (!token) {
-		throw new AuthException(7002, "Unauthorized");
+		if (!token) {
+			throw new AuthException(7002, "Unauthorized");
+		}
+
+		try {
+			await verifyAccessToken(c.env, token);
+		} catch (err) {
+			if (err instanceof AuthException) throw err;
+			throw new AuthException(7003, "Invalid or expired token");
+		}
+
+		await next();
 	}
-
-	try {
-		await verifyAccessToken(c.env, token);
-	} catch (err) {
-		if (err instanceof AuthException) throw err;
-		throw new AuthException(7003, "Invalid or expired token");
-	}
-
-	await next();
-}

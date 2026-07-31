@@ -4,7 +4,7 @@ import { tasksRouter } from "./endpoints/tasks";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { DummyEndpoint } from "./endpoints/dummyEndpoint";
 import { fromHono } from "./from-hono";
-import { JsonParser } from "./middleware/json-parser";
+import { JsonParserMiddleware } from "./middleware/json-parser";
 import { getMysqlDb } from "./db-mysql";
 import { users } from "./db-mysql/schema";
 import { AppContext } from "./types";
@@ -18,7 +18,7 @@ import signPage from "./client/index.html";
 const app = new Hono<{ Bindings: Env }>();
 
 //验证json格式
-app.use('*', JsonParser)
+app.use('*', JsonParserMiddleware)
 
 //统一异常处理
 app.onError((err, c: AppContext) => {
