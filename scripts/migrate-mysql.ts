@@ -71,6 +71,22 @@ function parseMysqlUrl(url: string) {
 	};
 }
 
+/** 从 wrangler.jsonc 读取 Hyperdrive 本地连接字符串 */
+function readLocalConnectionString(): string | null {
+	try {
+		const raw = readFileSync("wrangler.jsonc", "utf-8");
+		// 去掉 // 行注释后解析
+		const json = JSON.parse(raw.replace(/\/\/.*/g, ""));
+		const hyperdrive = json?.hyperdrive;
+		if (Array.isArray(hyperdrive) && hyperdrive.length > 0) {
+			return hyperdrive[0].localConnectionString || null;
+		}
+	} catch {
+		// 文件不存在或解析失败，跳过
+	}
+	return null;
+}
+
 async function main() {
 	const sshHost = process.env.SSH_HOST;
 	let connectionOptions: { uri: string } | Record<string, unknown>;
@@ -108,7 +124,13 @@ async function main() {
 		};
 	} else {
 		// ── 直连模式 ────────────────────────────────────────
-		connectionOptions = { uri: process.env.DATABASE_URL! };
+		// 优先 DATABASE_URL 环境变量，其次 wrangler.jsonc 的 localConnectionString
+		const url = process.env.DATABASE_URL || readLocalConnectionString();
+		if (!url) {
+			throw new Error("DATABASE_URL not set and no localConnectionString found in wrangler.jsonc");
+		}
+		console.log(`Connecting to: ${url.replace(/\/\/.*@/, "//***@")}`);
+		connectionOptions = { uri: url };
 	}
 
 	const connection = await createConnection(connectionOptions as any);
