@@ -1,5 +1,10 @@
 /// <reference types="node" />
 
+/**
+ * @note 本脚本仅在 Node.js 环境运行，不支持 Cloudflare Workers 环境。
+ * Workers 中不存在 fs、net、ssh2 等 Node 内置模块，迁移操作请通过 CLI 在本地执行。
+ */
+
 import { migrate } from "drizzle-orm/mysql2/migrator";
 import { drizzle } from "drizzle-orm/mysql2";
 import { createConnection } from "mysql2/promise";
