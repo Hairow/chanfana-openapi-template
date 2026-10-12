@@ -1,5 +1,10 @@
 /// <reference types="node" />
 
+/**
+ * @note 本脚本仅在 Node.js 环境运行，不支持 Cloudflare Workers 环境。
+ * Workers 中不存在 fs、net、ssh2 等 Node 内置模块，迁移操作请通过 CLI 在本地执行。
+ */
+
 import { migrate } from "drizzle-orm/mysql2/migrator";
 import { drizzle } from "drizzle-orm/mysql2";
 import { createConnection } from "mysql2/promise";
@@ -71,6 +76,22 @@ function parseMysqlUrl(url: string) {
 	};
 }
 
+/** 从 wrangler.jsonc 读取 Hyperdrive 本地连接字符串 */
+function readLocalConnectionString(): string | null {
+	try {
+		const raw = readFileSync("wrangler.jsonc", "utf-8");
+		// 去掉 // 行注释后解析
+		const json = JSON.parse(raw.replace(/\/\/.*/g, ""));
+		const hyperdrive = json?.hyperdrive;
+		if (Array.isArray(hyperdrive) && hyperdrive.length > 0) {
+			return hyperdrive[0].localConnectionString || null;
+		}
+	} catch {
+		// 文件不存在或解析失败，跳过
+	}
+	return null;
+}
+
 async function main() {
 	const sshHost = process.env.SSH_HOST;
 	let connectionOptions: { uri: string } | Record<string, unknown>;
@@ -108,7 +129,13 @@ async function main() {
 		};
 	} else {
 		// ── 直连模式 ────────────────────────────────────────
-		connectionOptions = { uri: process.env.DATABASE_URL! };
+		// 优先 DATABASE_URL 环境变量，其次 wrangler.jsonc 的 localConnectionString
+		const url = process.env.DATABASE_URL || readLocalConnectionString();
+		if (!url) {
+			throw new Error("DATABASE_URL not set and no localConnectionString found in wrangler.jsonc");
+		}
+		console.log(`Connecting to: ${url.replace(/\/\/.*@/, "//***@")}`);
+		connectionOptions = { uri: url };
 	}
 
 	const connection = await createConnection(connectionOptions as any);
