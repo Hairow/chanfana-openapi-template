@@ -6,6 +6,7 @@
 	],
 	"main": "src/index.ts",
 	"name": "chanfana-openapi-template",
+	"workers_dev": false,
 	"preview_urls": false,
 	"upload_source_maps": true,
 	"observability": {
@@ -21,7 +22,7 @@
 	"hyperdrive": [
 		{
 			"binding": "HYPERDRIVE",
-			"id": "1134193d6ad54b80ae19f1922f95872c",
+			"id": "d2ad9fd45e2a44f4bd664e7991658033",
 			"localConnectionString": "mysql://root:root@127.0.0.1:3306/fnos_cf_demo"
 		}
 	],
