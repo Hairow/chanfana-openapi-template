@@ -15,6 +15,7 @@
 		"preview_image_url": "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/cbde46cf-20fa-4548-7f70-1ae8c2f48900/preview",
 		"publish": true
 	},
+	"packageManager": "pnpm@12.11.2",
 	"dependencies": {
 		"chanfana": "2.8.3",
 		"dotenv": "^17.4.2",
@@ -41,14 +42,14 @@
 	"private": true,
 	"scripts": {
 		"db:generate": "drizzle-kit generate --config=drizzle.config.d1.ts && drizzle-kit generate --config=drizzle.config.mysql.ts",
-		"db:mysql:migrate": "npx tsx scripts/migrate-mysql.ts",
-		"db:mysql:migrate_remote": "ENV_FILE=.env.prod npx tsx scripts/migrate-mysql.ts",
+		"db:mysql:migrate": "pnpm dlx tsx scripts/migrate-mysql.ts",
+		"db:mysql:migrate_remote": "ENV_FILE=.env.prod pnpm dlx tsx scripts/migrate-mysql.ts",
 		"predev": "wrangler d1 migrations apply DB --local",
 		"dev": "wrangler dev --local",
 		"predeploy": "wrangler d1 migrations apply DB --remote",
 		"deploy": "wrangler deploy",
 		"prepare": "node scripts/prepare.cjs",
-		"schema": "NODE_OPTIONS=--no-deprecation npx chanfana",
-		"test": "wrangler deploy --dry-run && npx vitest run --config tests/vitest.config.mts"
+		"schema": "NODE_OPTIONS=--no-deprecation chanfana",
+		"test": "wrangler deploy --dry-run && vitest run --config tests/vitest.config.mts"
 	}
 }

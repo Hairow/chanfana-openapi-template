@@ -12,7 +12,7 @@
 
 本模板包含多个端点示例、一个 D1 数据库以及基于 [Vitest](https://vitest.dev/) 的集成测试。端点中既有 [chanfana D1 自动端点](https://chanfana.com/endpoints/auto/d1)，也有[普通端点](https://chanfana.com/endpoints/defining-endpoints)，可作为实际项目的参考。
 
-除了在浏览器中查看 OpenAPI schema（openapi.json），你也可以通过运行 `npm run schema` 命令直接在本地导出 schema。
+除了在浏览器中查看 OpenAPI schema（openapi.json），你也可以通过运行 `pnpm run schema` 命令直接在本地导出 schema。
 
 <!-- dash-content-end -->
 
@@ -24,7 +24,7 @@
 除了克隆本仓库，你也可以使用 [C3](https://developers.cloudflare.com/pages/get-started/c3/)（`create-cloudflare` CLI）基于此模板创建新项目：
 
 ```bash
-npm create cloudflare@latest -- --template=cloudflare/templates/openapi-template
+pnpm create cloudflare@latest -- --template=cloudflare/templates/openapi-template
 ```
 
 本模板的公开部署示例：[https://openapi-template.templates.workers.dev](https://openapi-template.templates.workers.dev)
@@ -33,23 +33,23 @@ npm create cloudflare@latest -- --template=cloudflare/templates/openapi-template
 
 1. 安装项目依赖：
    ```bash
-   npm install
+   pnpm install
    ```
 2. 创建一个 [D1 数据库](https://developers.cloudflare.com/d1/get-started/)，命名为 "openapi-template-db"：
    ```bash
-   npx wrangler d1 create openapi-template-db
+   pnpm exec wrangler d1 create openapi-template-db
    ```
    ...然后将 `wrangler.jsonc` 中的 `database_id` 替换为新数据库的 ID。
 3. 部署项目（`predeploy` 会自动执行 D1 远程迁移，无需手动迁移）：
    ```bash
-   npm run deploy
+   pnpm run deploy
    ```
 4. 监控 Worker 运行日志：
    ```bash
-   npx wrangler tail
+   pnpm exec wrangler tail
    ```
 
-> 本地开发时，`npm run dev` 也会通过 `predev` 自动应用 D1 本地迁移，同样无需手动操作。
+> 本地开发时，`pnpm run dev` 也会通过 `predev` 自动应用 D1 本地迁移，同样无需手动操作。
 
 ---
 
@@ -180,14 +180,14 @@ MySQL 通过 Cloudflare Hyperdrive 连接，支持本地直连和 SSH 隧道两�
 
 | 命令 | 说明 |
 |------|------|
-| `npm run dev` | 本地开发启动（自动应用 D1 本地迁移） |
-| `npm run deploy` | 部署到 Cloudflare（自动应用 D1 远程迁移） |
-| `npm run schema` | 导出 OpenAPI JSON Schema |
-| `npm run test` | 先 dry-run 检查，再运行 Vitest 集成测试 |
-| `npm run db:generate` | 同时生成 D1 和 MySQL 的 migration 文件 |
-| `npm run db:mysql:migrate` | 本地执行 MySQL 迁移（读取 `.env`） |
-| `npm run db:mysql:migrate_remote` | 远程执行 MySQL 迁移（读取 `.env.prod`，支持 SSH 隧道） |
-| `npm run prepare` | 安装 git pre-commit hook（schema 变更自动生成 migration） |
+| `pnpm run dev` | 本地开发启动（自动应用 D1 本地迁移） |
+| `pnpm run deploy` | 部署到 Cloudflare（自动应用 D1 远程迁移） |
+| `pnpm run schema` | 导出 OpenAPI JSON Schema |
+| `pnpm run test` | 先 dry-run 检查，再运行 Vitest 集成测试 |
+| `pnpm run db:generate` | 同时生成 D1 和 MySQL 的 migration 文件 |
+| `pnpm run db:mysql:migrate` | 本地执行 MySQL 迁移（读取 `.env`） |
+| `pnpm run db:mysql:migrate_remote` | 远程执行 MySQL 迁移（读取 `.env.prod`，支持 SSH 隧道） |
+| `pnpm run prepare` | 安装 git pre-commit hook（schema 变更自动生成 migration） |
 
 ---
 
@@ -196,7 +196,7 @@ MySQL 通过 Cloudflare Hyperdrive 连接，支持本地直连和 SSH 隧道两�
 本模板包含基于 [Vitest](https://vitest.dev/) 的集成测试，通过 `SELF.fetch` 模拟 Worker 环境：
 
 ```bash
-npm run test
+pnpm run test
 ```
 
 测试覆盖：
